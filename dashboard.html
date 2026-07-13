@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dilatih — Dashboard Pemasaran</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0f1729;
+    --panel:#ffffff;
+    --ink:#1a2238;
+    --muted:#64708a;
+    --line:#e6eaf2;
+    --accent:#2563eb;
+    --accent2:#7c3aed;
+    --teal:#0d9488;
+    --good:#16a34a;
+    --warn:#d97706;
+    --bad:#dc2626;
+    --soft:#f4f6fb;
+    --shadow:0 1px 3px rgba(16,24,40,.06),0 8px 24px rgba(16,24,40,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+    background:linear-gradient(180deg,#0f1729 0%,#16203a 280px,#eef1f7 280px,#eef1f7 100%);
+    color:var(--ink);
+    line-height:1.55;
+    padding:0 20px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+
+  /* Header */
+  header{padding:36px 0 26px;color:#fff}
+  .brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .logo{
+    width:46px;height:46px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:22px;color:#fff;box-shadow:0 6px 18px rgba(37,99,235,.4)
+  }
+  header h1{font-size:30px;font-weight:800;letter-spacing:-.5px}
+  header .sub{color:#aebbd6;margin-top:6px;font-size:14.5px}
+  .badges{margin-top:16px;display:flex;gap:9px;flex-wrap:wrap}
+  .badge{
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);
+    color:#dce4f5;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:600
+  }
+  .badge.warn{background:rgba(217,119,6,.18);border-color:rgba(217,119,6,.5);color:#ffd9a8}
+
+  /* Panels */
+  section.panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:24px;margin-bottom:22px;box-shadow:var(--shadow)
+  }
+  .panel h2{font-size:18px;font-weight:800;display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .panel h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+  .panel .lead{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+
+  /* KPI grid */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:-6px}
+  .kpi{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden
+  }
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .kpi.k-violet::before{background:var(--accent2)}
+  .kpi.k-teal::before{background:var(--teal)}
+  .kpi.k-good::before{background:var(--good)}
+  .kpi.k-warn::before{background:var(--warn)}
+  .kpi.k-bad::before{background:var(--bad)}
+  .kpi .label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+  .kpi .val{font-size:26px;font-weight:800;margin:6px 0 2px;letter-spacing:-.5px}
+  .kpi .note{font-size:12px;color:var(--muted)}
+  .tag-tbd{display:inline-block;background:#fee2e2;color:#b91c1c;font-size:10.5px;font-weight:700;
+    padding:2px 8px;border-radius:6px;margin-left:6px;vertical-align:middle}
+
+  /* Charts */
+  .chart-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:22px}
+  .chart-box{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .chart-box h3{font-size:14px;font-weight:700;margin-bottom:4px}
+  .chart-box p{font-size:12px;color:var(--muted);margin-bottom:12px}
+  .chart-canvas{position:relative;height:300px}
+  .chart-canvas.tall{height:430px}
+
+  /* Bets */
+  .bets{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .bet{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:18px;position:relative}
+  .bet .num{
+    width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:10px
+  }
+  .bet h4{font-size:14.5px;font-weight:700;margin-bottom:6px}
+  .bet p{font-size:12.5px;color:var(--muted)}
+
+  /* Two-col assets vs leaks */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .col-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .col-title.ok{color:var(--good)}
+  .col-title.bad{color:var(--bad)}
+  .item{display:flex;gap:10px;padding:11px 13px;border-radius:11px;margin-bottom:9px;font-size:13px}
+  .item.ok{background:#f0fdf4;border:1px solid #bbf7d0}
+  .item.bad{background:#fef2f2;border:1px solid #fecaca}
+  .item .ic{font-weight:800;flex-shrink:0}
+  .item.ok .ic{color:var(--good)}
+  .item.bad .ic{color:var(--bad)}
+  .item b{display:block;font-size:13px}
+  .item span{color:var(--muted);font-size:12px}
+
+  /* Roadmap timeline */
+  .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+  .phase{position:relative;padding:0 14px}
+  .phase:not(:last-child){border-right:1px dashed var(--line)}
+  .phase .head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .phase .wk{font-size:11px;font-weight:800;color:#fff;background:var(--accent);padding:3px 9px;border-radius:999px}
+  .phase:nth-child(2) .wk{background:var(--accent2)}
+  .phase:nth-child(3) .wk{background:var(--teal)}
+  .phase:nth-child(4) .wk{background:var(--good)}
+  .phase h4{font-size:13.5px;font-weight:800;margin:8px 0 10px}
+  .phase ul{list-style:none}
+  .phase li{font-size:12px;color:var(--ink);padding:7px 0;border-top:1px solid var(--line);display:flex;gap:6px;flex-wrap:wrap;align-items:baseline}
+  .pill{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:5px;background:#e0e7ff;color:#3730a3}
+  .pill.pic{background:#ede9fe;color:#5b21b6}
+
+  /* Lists / priorities */
+  .pri-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  ol.pri{list-style:none;counter-reset:p}
+  ol.pri li{counter-increment:p;position:relative;padding:10px 0 10px 38px;border-bottom:1px solid var(--line);font-size:13px}
+  ol.pri li::before{content:counter(p);position:absolute;left:0;top:9px;width:26px;height:26px;border-radius:8px;
+    background:var(--soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--accent)}
+  ol.pri li .who{color:var(--muted);font-size:11.5px}
+  .northstar{background:linear-gradient(135deg,#1e293b,#312e81);color:#fff;border-radius:14px;padding:20px;height:100%}
+  .northstar .k{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#a5b4fc;font-weight:700}
+  .northstar .v{font-size:18px;font-weight:800;margin-top:8px;line-height:1.35}
+  .northstar p{font-size:12.5px;color:#c7d2fe;margin-top:10px}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line)}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);background:var(--soft)}
+  tbody tr:hover{background:#fafbfe}
+  td.tbd{color:var(--bad);font-weight:700}
+  .chip{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px}
+  .chip.hi{background:#fee2e2;color:#b91c1c}
+  .chip.md{background:#fef3c7;color:#92400e}
+  .chip.lo{background:#dbeafe;color:#1e40af}
+
+  /* Open decisions */
+  .dec{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+  .dec .rank{flex-shrink:0;width:26px;height:26px;border-radius:8px;background:var(--soft);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--muted)}
+  .dec.top .rank{background:var(--bad);color:#fff;border-color:var(--bad)}
+  .dec b{font-size:13px}
+  .dec span{font-size:12px;color:var(--muted);display:block;margin-top:2px}
+
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:30px;line-height:1.8}
+  footer code{background:#e5e9f2;padding:2px 6px;border-radius:5px;font-size:11.5px}
+
+  @media (max-width:900px){
+    .kpi-grid{grid-template-columns:repeat(2,1fr)}
+    .chart-grid,.two-col,.bets,.pri-grid{grid-template-columns:1fr}
+    .timeline{grid-template-columns:1fr}
+    .phase{border-right:none !important;border-bottom:1px dashed var(--line);padding:14px 0}
+    body{background:linear-gradient(180deg,#0f1729 0%,#16203a 220px,#eef1f7 220px,#eef1f7 100%)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== HEADER ===== -->
+  <header>
+    <div class="brand">
+      <div class="logo">D</div>
+      <div>
+        <h1>Dilatih — Dashboard Pemasaran</h1>
+        <div class="sub">Ringkasan eksekutif Rencana Pemasaran v1 · Kerangka AARRR · 12 bulan</div>
+      </div>
+    </div>
+    <div class="badges">
+      <span class="badge">Status: Draft v1 (finalized)</span>
+      <span class="badge">Data per 2026-06-20</span>
+      <span class="badge">Bootstrapped · &lt;Rp1M/thn</span>
+      <span class="badge">Pasar: Indonesia</span>
+      <span class="badge warn">Pivot: B2C → B2B in-house + BNSP</span>
+    </div>
+  </header>
+
+  <!-- ===== KPI ROW ===== -->
+  <div class="kpi-grid">
+    <div class="kpi k-warn">
+      <div class="label">Skor Audit Saat Ini</div>
+      <div class="val">28 / 85</div>
+      <div class="note">33% — "bukti kuat, mesin bocor"</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Trafik Website</div>
+      <div class="val">~500<span style="font-size:14px;font-weight:600">/bln</span></div>
+      <div class="note">Top-of-funnel masih tipis</div>
+    </div>
+    <div class="kpi k-violet">
+      <div class="label">Audiens Sosial</div>
+      <div class="val">5.700 · 4.100</div>
+      <div class="note">Instagram · TikTok (followers)</div>
+    </div>
+    <div class="kpi k-teal">
+      <div class="label">Jangkauan Konten Viral</div>
+      <div class="val">300.000+</div>
+      <div class="note">Tayangan di IG/TikTok</div>
+    </div>
+    <div class="kpi k-good">
+      <div class="label">Order B2C (per orang)</div>
+      <div class="val">~Rp750rb</div>
+      <div class="note">Kelas terbuka, sekali jalan</div>
+    </div>
+    <div class="kpi k-good">
+      <div class="label">Order B2B (per batch)</div>
+      <div class="val">Rp8–20jt</div>
+      <div class="note">10–27× nilai 1 kursi B2C</div>
+    </div>
+    <div class="kpi k-violet">
+      <div class="label">Proyeksi 12 Bulan</div>
+      <div class="val">~1,5–2,5×</div>
+      <div class="note">Pendapatan saat ini (jujur)</div>
+    </div>
+    <div class="kpi k-bad">
+      <div class="label">CAC · Repeat · LTV</div>
+      <div class="val">TBD <span class="tag-tbd">BELUM DILACAK</span></div>
+      <div class="note">Keputusan terbuka #1 (§13)</div>
+    </div>
+  </div>
+
+  <!-- ===== CHARTS ===== -->
+  <section class="panel">
+    <h2><span class="dot"></span>Diagnostik & Proyeksi</h2>
+    <div class="lead">Visualisasi skor audit 17-section, bentuk kekuatan vs kelemahan, leverage B2B, dan jalur pertumbuhan 12 bulan.</div>
+    <div class="chart-grid">
+      <div class="chart-box">
+        <h3>Skor Rubrik Audit per Bagian (0–5)</h3>
+        <p>Kekuatan: konten/sosial (#7) & kredibilitas B2B laten (#10). Kelemahan: mesin konversi (#5, #6, #13).</p>
+        <div class="chart-canvas tall"><canvas id="auditChart"></canvas></div>
+      </div>
+      <div>
+        <div class="chart-box" style="margin-bottom:22px">
+          <h3>Komposisi Skor Total</h3>
+          <p>28 dari 85 poin tercapai (33%).</p>
+          <div class="chart-canvas" style="height:180px"><canvas id="donutChart"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <h3>Leverage Nilai Order: B2C vs B2B</h3>
+          <p>1 batch B2B ≈ 10–27 kursi B2C.</p>
+          <div class="chart-canvas" style="height:180px"><canvas id="leverageChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-box" style="margin-top:22px">
+      <h3>Proyeksi Pertumbuhan 12 Bulan — Linear + Step-Function</h3>
+      <p>Basis linear (seat B2C + SEO menumpuk) + lompatan tiap akun B2B berulang/tahunan. Indeks pendapatan, baseline = 1,0×.</p>
+      <div class="chart-canvas"><canvas id="growthChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ===== 3 BIG BETS ===== -->
+  <section class="panel">
+    <h2><span class="dot"></span>Tiga Taruhan Besar (diurut leverage)</h2>
+    <div class="lead">Inti strategi: ubah bukti & jangkauan yang sudah ada menjadi pipeline B2B yang berulang.</div>
+    <div class="bets">
+      <div class="bet">
+        <div class="num">1</div>
+        <h4>B2B + BNSP sebagai mesin utama</h4>
+        <p>B2C jadi top-of-funnel. Satu batch korporat bernilai 10–27× satu kursi B2C; sertifikasi BNSP = parit pertahanan yang sah secara regulasi.</p>
+      </div>
+      <div class="bet">
+        <div class="num">2</div>
+        <h4>Perbaiki mesin sebelum tambah bensin</h4>
+        <p>Kebocoran #1 (inquiry dingin) & #2 (tidak ada repeat) adalah perbaikan ROI tertinggi — dan gratis. Sistem capture/respons + lifecycle.</p>
+      </div>
+      <div class="bet">
+        <div class="num">3</div>
+        <h4>Formalkan referral</h4>
+        <p>Kanal #1 yang dibiarkan kebetulan. Model murni co-marketing (tanpa tunai): atribusi, ajakan terstruktur, co-marketing Pelindo/Peruri.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ASSETS vs LEAKS ===== -->
+  <section class="panel">
+    <h2><span class="dot"></span>Aset Unggulan vs Kebocoran Mesin</h2>
+    <div class="lead">Bentuk "bukti kuat, mesin bocor": kredibilitas & jangkauan ada, tapi tidak ada yang menangkap/mengonversi/memajemukkannya.</div>
+    <div class="two-col">
+      <div>
+        <div class="col-title ok">✚ Aset (kembangkan)</div>
+        <div class="item ok"><span class="ic">✓</span><div><b>Klien marquee: PwC, Peruri, Pemkab Bandung Barat</b><span>Social proof kelas elit — aset terbesar yang paling kurang dimanfaatkan.</span></div></div>
+        <div class="item ok"><span class="ic">✓</span><div><b>Status lembaga sertifikasi + penyedia BNSP</b><span>Benteng regulasi; sudut "diakui/tersertifikasi".</span></div></div>
+        <div class="item ok"><span class="ic">✓</span><div><b>Kemitraan: Pelindo, Peruri</b><span>Sudah jadi sumber penjualan #1 (referral) — formalkan.</span></div></div>
+        <div class="item ok"><span class="ic">✓</span><div><b>Konten viral 300.000+ tayangan</b><span>Bukti tim mampu menciptakan jangkauan; butuh mekanisme capture.</span></div></div>
+        <div class="item ok"><span class="ic">✓</span><div><b>Distribusi milik sendiri: IG 5.700 · TikTok 4.100 · blog SEO</b><span>Basis untuk dimajemukkan.</span></div></div>
+      </div>
+      <div>
+        <div class="col-title bad">⚠ Kebocoran (perbaiki kuartal ini)</div>
+        <div class="item bad"><span class="ic">!</span><div><b>Inquiry menjadi dingin</b><span>Pendapatan hilang dari traffic yang sudah diperoleh → sistem follow-up WA/lead + PIC (Adit), SLA &lt;2 jam.</span></div></div>
+        <div class="item bad"><span class="ic">!</span><div><b>Tidak ada bisnis berulang</b><span>Setiap penjualan mulai dari nol → gerakan pasca-pembelian + ekspansi akun B2B.</span></div></div>
+        <div class="item bad"><span class="ic">!</span><div><b>Tidak ada pelacakan lead/funnel</b><span>Berjalan tanpa arah; tak bisa hitung CAC → GA4 + CRM/sheet sederhana.</span></div></div>
+        <div class="item bad"><span class="ic">!</span><div><b>Tidak ada landing B2B/BNSP + aset penjualan</b><span>Bukti unggulan tak terkonversi → /in-house-training, /sertifikasi-bnsp, /klien + sales deck + studi kasus.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ROADMAP ===== -->
+  <section class="panel">
+    <h2><span class="dot"></span>Roadmap 90 Hari</h2>
+    <div class="lead">Penanggung jawab: <b>Arsy</b> (konten/SEO/desain) · <b>Adit</b> (ops/lifecycle/iklan) · <b>Vika</b> (sales B2B/referral) · <b>Vania</b> (pricing/ekonomi). Tahap: Acq/Act/Ret/Ref/Rev/Ops.</div>
+    <div class="timeline">
+      <div class="phase">
+        <div class="head"><span class="wk">Mgg 1–2</span></div>
+        <h4>Buka Hambatan</h4>
+        <ul>
+          <li>Inbox lead terpusat + SLA respons &lt;2 jam <span class="pill">Act</span><span class="pill pic">Adit</span></li>
+          <li>Tambah "siapa yang mereferensikan?" di semua form <span class="pill">Ref</span><span class="pill pic">Adit</span></li>
+          <li>Event GA4 + CRM/sheet (lead→proposal→menang) <span class="pill">Ops</span><span class="pill pic">Adit</span></li>
+          <li>Catat tanggal sertifikat + riwayat pembelian <span class="pill">Ret</span><span class="pill pic">Adit</span></li>
+          <li>Baseline pendapatan dari Xendit <span class="pill">Rev</span><span class="pill pic">Vania</span></li>
+          <li>Pilih 2 klaster SEO (BNSP + in-house AI) <span class="pill">Acq</span><span class="pill pic">Arsy</span></li>
+        </ul>
+      </div>
+      <div class="phase">
+        <div class="head"><span class="wk">Mgg 3–4</span></div>
+        <h4>Fondasi</h4>
+        <ul>
+          <li>Rilis /in-house-training, /sertifikasi-bnsp, /klien <span class="pill">Acq</span><span class="pill pic">Arsy</span></li>
+          <li>Halaman pilar SEO pertama tayang <span class="pill">Acq</span><span class="pill pic">Arsy</span></li>
+          <li>Mulai kadens LinkedIn mingguan <span class="pill">Acq</span><span class="pill pic">Arsy/Vika</span></li>
+          <li>Template proposal B2B + one-pager bukti <span class="pill">Act</span><span class="pill pic">Vika</span></li>
+          <li>Alur pasca-checkout B2C + kirim sertifikat <span class="pill">Act</span><span class="pill pic">Adit</span></li>
+          <li>Susun 3 paket in-house standar <span class="pill">Rev</span><span class="pill pic">Vania</span></li>
+        </ul>
+      </div>
+      <div class="phase">
+        <div class="head"><span class="wk">Mgg 5–8</span></div>
+        <h4>Velocity</h4>
+        <ul>
+          <li>2 artikel klaster / minggu <span class="pill">Acq</span><span class="pill pic">Arsy</span></li>
+          <li>Halaman perbandingan (vs Binar / Media Edutama) <span class="pill">Acq</span><span class="pill pic">Arsy</span></li>
+          <li>Olah 1 penyelenggaraan jadi studi kasus <span class="pill">Acq</span><span class="pill pic">Arsy/Vika</span></li>
+          <li>Luncurkan retargeting Meta (Rp500rb) <span class="pill">Acq</span><span class="pill pic">Adit</span></li>
+          <li>Ajakan referral ke klien puas + co-marketing Pelindo/Peruri <span class="pill">Ref</span><span class="pill pic">Vika</span></li>
+          <li>Hubungi PwC/Peruri/pemerintah: kohor berikutnya <span class="pill">Ret</span><span class="pill pic">Vika</span></li>
+        </ul>
+      </div>
+      <div class="phase">
+        <div class="head"><span class="wk">Mgg 9–12</span></div>
+        <h4>Compound</h4>
+        <ul>
+          <li>Klaster SEO kedua tayang <span class="pill">Acq</span><span class="pill pic">Arsy</span></li>
+          <li>Daftar outbound B2B + sequence tayang <span class="pill">Acq</span><span class="pill pic">Vika</span></li>
+          <li>Pengingat resertifikasi pertama <span class="pill">Ret</span><span class="pill pic">Adit</span></li>
+          <li>Referral alumni B2C + share sertifikat <span class="pill">Ref</span><span class="pill pic">Adit</span></li>
+          <li>Uji A/B pertama (copy/format proposal) <span class="pill">Act</span><span class="pill pic">Adit</span></li>
+          <li>Tinjauan 90 hari + baseline CAC <span class="pill">Ops</span><span class="pill pic">Adit/Vania</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRIORITIES + NORTH STAR ===== -->
+  <section class="panel">
+    <h2><span class="dot"></span>Prioritas 90 Hari & North Star</h2>
+    <div class="pri-grid">
+      <div>
+        <ol class="pri">
+          <li>Bangun sistem capture + respons lead (SLA &lt;2 jam) — hentikan inquiry dingin. <span class="who">PIC: Adit</span></li>
+          <li>Pasang tracking GA4 + CRM sederhana untuk baseline CAC. <span class="who">PIC: Adit/Vania</span></li>
+          <li>Rilis halaman /in-house-training, /sertifikasi-bnsp, /klien. <span class="who">PIC: Arsy</span></li>
+          <li>Semai 2 cluster SEO buyer-intent + mulai cadence LinkedIn. <span class="who">PIC: Arsy/Vika</span></li>
+          <li>Standardisasi 3 paket in-house + premium BNSP eksplisit. <span class="who">PIC: Vania/Vika</span></li>
+          <li>Alur lifecycle B2C + penyerahan sertifikat + ajakan referral. <span class="who">PIC: Adit/Vika</span></li>
+        </ol>
+      </div>
+      <div>
+        <div class="northstar">
+          <div class="k">★ North Star Metric (usulan)</div>
+          <div class="v">Pendapatan dari akun B2B berulang + resertifikasi per kuartal</div>
+          <p>Menangkap tesis inti: pergeseran dari penjualan sekali jalan ke pendapatan yang berlipat (compounding) — bagian pendapatan yang <i>berulang</i>, karena itulah yang membuat Dilatih tahan lama.</p>
+          <p style="margin-top:14px;color:#a5b4fc"><b>Outlook 12 bulan:</b> SEO jadi sumber lead B2B terukur · mix 3-kanal (SEO+LinkedIn+referral) teratribusi · ≥1 perjanjian mitra pelatihan tahunan · baseline CAC/LTV diketahui → rencana naik ke v2.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== UNIT ECONOMICS ===== -->
+  <section class="panel">
+    <h2><span class="dot"></span>Unit Economics</h2>
+    <div class="lead">Baris harga kini nyata; CAC, repeat rate, dan LTV masih TBD — itulah tugas pertama rencana ini.</div>
+    <table>
+      <thead><tr><th>Metrik</th><th>Nilai</th><th>Catatan</th></tr></thead>
+      <tbody>
+        <tr><td>ARPC — per pesanan B2C</td><td><b>~Rp750.000</b></td><td>Kursi open-course; sekali jalan saat ini.</td></tr>
+        <tr><td>ARPC — per batch B2B</td><td><b>~Rp8–20 juta</b></td><td>Bervariasi menurut peserta + durasi; jalur BNSP lebih tinggi.</td></tr>
+        <tr><td>Blended CAC</td><td class="tbd">TBD</td><td>Keputusan terbuka teratas. Setiap proyeksi bergantung pada ini.</td></tr>
+        <tr><td>Repeat / retensi tahunan</td><td class="tbd">TBD</td><td>~0 pembelian berulang sistematis saat ini (kebocoran #2).</td></tr>
+        <tr><td>LTV (kasar)</td><td class="tbd">TBD</td><td>Tak dapat dihitung sampai repeat rate + CAC diketahui.</td></tr>
+        <tr><td>LTV / CAC</td><td class="tbd">TBD</td><td>Target &gt;3 begitu dapat diukur.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== OPEN DECISIONS + RACI ===== -->
+  <section class="panel">
+    <h2><span class="dot"></span>Keputusan Terbuka yang Memblokir</h2>
+    <div class="lead">Diurut dampak. Tiga teratas (merah) wajib ditutup di Mgg 1–2.</div>
+    <div class="two-col">
+      <div>
+        <div class="dec top"><div class="rank">1</div><div><b>CAC belum diketahui</b><span>Dampak tertinggi. Setiap proyeksi §10 bergantung pada ini. → instrumentasi tracking (Mgg 1–2).</span></div></div>
+        <div class="dec top"><div class="rank">2</div><div><b>Tidak ada tracking lead</b><span>Tak bisa mengukur kebocoran inquiry-dingin. → CRM/sheet + GA4 event.</span></div></div>
+        <div class="dec top"><div class="rank">3</div><div><b>Kepemilikan relasi peserta/sertifikat BNSP</b><span>Menentukan apakah resertifikasi jadi pendapatan berulang <i>Anda</i>. → konfirmasi penyedia BNSP.</span></div></div>
+        <div class="dec"><div class="rank">4</div><div><b>Unit economics B2B</b><span>Margin per batch, split pendapatan BNSP belum jelas. → Vania analisis Xendit.</span></div></div>
+      </div>
+      <div>
+        <div class="dec"><div class="rank">5</div><div><b>Total anggaran pemasaran</b><span>Hanya tes iklan Rp500rb yang diketahui. → Vania tetapkan plafon bulanan.</span></div></div>
+        <div class="dec"><div class="rank">6</div><div><b>Brand voice resmi</b><span>Usulan §2 perlu dikonfirmasi/diadopsi tim.</span></div></div>
+        <div class="dec"><div class="rank">7</div><div><b>Kapasitas tim untuk Mgg 5–8</b><span>Apakah 4 orang sanggup beban velocity? Jika tidak, prioritaskan ulang.</span></div></div>
+        <div class="dec"><div class="rank">8</div><div><b>Keputusan raise (12 bln)</b><span>Tetap bootstrapped atau cari modal — mengubah skenario §10.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2><span class="dot"></span>RACI Ringkas</h2>
+    <div class="lead">Prinsip: strategi di internal, eksekusi boleh di-outsource saat arus kas memungkinkan. Hire pertama yang disarankan: kontraktor demand-ops/ad-ops paruh waktu.</div>
+    <table>
+      <thead><tr><th>Domain</th><th>Responsible / Accountable</th><th>Consulted</th></tr></thead>
+      <tbody>
+        <tr><td>Rencana strategis & brand voice</td><td><b>Arsy</b></td><td>Vania, Vika, Adit</td></tr>
+        <tr><td>SEO & konten</td><td><b>Arsy</b></td><td>Adit</td></tr>
+        <tr><td>Sosial founder-led / LinkedIn</td><td><b>Arsy</b>, Vika</td><td>—</td></tr>
+        <tr><td>Lead capture & tracking</td><td><b>Adit</b></td><td>Vika</td></tr>
+        <tr><td>Lifecycle (email/WA)</td><td><b>Adit</b></td><td>Arsy</td></tr>
+        <tr><td>Sales B2B & proposal</td><td><b>Vika</b></td><td>Vania</td></tr>
+        <tr><td>Referral & co-marketing</td><td><b>Vika</b></td><td>Arsy</td></tr>
+        <tr><td>Pricing & unit economics</td><td><b>Vania</b></td><td>Vika, Arsy</td></tr>
+        <tr><td>Paid ads (saat unlock)</td><td><b>Adit</b></td><td>Vania</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    Dashboard dihasilkan dari <code>marketing/plan.md</code> (Rencana Pemasaran v1, 13 section AARRR), <code>research.md</code>, dan <code>progress.md</code>.<br>
+    Semua angka mencerminkan data per <b>2026-06-20</b> · Status: Draft v1 untuk review tim · Bahasa Indonesia.<br>
+    Dilatih — pelatihan & sertifikasi tersertifikasi untuk tenaga kerja Indonesia.
+  </footer>
+
+</div>
+
+<script>
+// ====== Chart.js global defaults ======
+if (window.Chart) {
+  Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = '#64708a';
+
+  const sectionLabels = [
+    '1. Positioning','2. Riset pelanggan','3. Homepage','4. Halaman penjualan',
+    '5. Halaman konversi','6. Perbandingan kompetitor','7. Resources/konten','8. Onboarding',
+    '9. Siklus email','10. Materi penjualan','11. Messaging','12. Pricing',
+    '13. CRO','14. Peluncuran GTM','15. Ads (berbayar)','16. SEO','17. Internasionalisasi'
+  ];
+  const sectionScores = [2,2,2,2,1,0,3,1,2,2,2,2,1,2,1,2,1];
+  const scoreColor = s => s>=3 ? '#16a34a' : s===2 ? '#d97706' : s<=1 ? '#dc2626' : '#94a3b8';
+
+  // ---- Audit horizontal bar ----
+  new Chart(document.getElementById('auditChart'), {
+    type:'bar',
+    data:{ labels:sectionLabels, datasets:[{ label:'Skor (0–5)', data:sectionScores,
+      backgroundColor:sectionScores.map(scoreColor), borderRadius:5, barThickness:14 }] },
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        tooltip:{ callbacks:{ label:c=>`Skor: ${c.raw} / 5` } } },
+      scales:{ x:{ min:0,max:5, ticks:{stepSize:1}, grid:{color:'#e6eaf2'} },
+        y:{ grid:{display:false}, ticks:{font:{size:11}} } } }
+  });
+
+  // ---- Donut total ----
+  new Chart(document.getElementById('donutChart'), {
+    type:'doughnut',
+    data:{ labels:['Tercapai (28)','Gap (57)'],
+      datasets:[{ data:[28,57], backgroundColor:['#2563eb','#e6eaf2'], borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'68%',
+      plugins:{ legend:{position:'bottom', labels:{boxWidth:12,padding:14}},
+        tooltip:{ callbacks:{ label:c=>`${c.label}: ${c.raw} poin` } } } }
+  });
+
+  // ---- Leverage B2C vs B2B ----
+  new Chart(document.getElementById('leverageChart'), {
+    type:'bar',
+    data:{ labels:['B2C / kursi','B2B / batch (min)','B2B / batch (maks)'],
+      datasets:[{ label:'Nilai order (Rp juta)', data:[0.75,8,20],
+        backgroundColor:['#94a3b8','#7c3aed','#2563eb'], borderRadius:6, barThickness:34 }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        tooltip:{ callbacks:{ label:c=>`Rp ${c.raw.toLocaleString('id-ID')} juta` } } },
+      scales:{ y:{ grid:{color:'#e6eaf2'}, ticks:{ callback:v=>'Rp'+v+'jt' } },
+        x:{ grid:{display:false}, ticks:{font:{size:10}} } } }
+  });
+
+  // ---- Growth projection ----
+  new Chart(document.getElementById('growthChart'), {
+    type:'line',
+    data:{ labels:['Baseline','Q1','Q2','Q3','Q4'],
+      datasets:[
+        { label:'Skenario bawah (~1,5×)', data:[1,1.05,1.2,1.35,1.5],
+          borderColor:'#7c3aed', backgroundColor:'rgba(124,58,237,.08)',
+          tension:.3, fill:true, pointRadius:4, borderWidth:2 },
+        { label:'Skenario atas (~2,5×)', data:[1,1.1,1.5,2.0,2.5],
+          borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,.08)',
+          tension:.3, fill:true, pointRadius:4, borderWidth:2, borderDash:[6,4] }
+      ] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom', labels:{boxWidth:14,padding:16}},
+        tooltip:{ callbacks:{ label:c=>`${c.dataset.label}: ${c.raw}× pendapatan` } } },
+      scales:{ y:{ min:0.8, grid:{color:'#e6eaf2'}, ticks:{ callback:v=>v+'×' } },
+        x:{ grid:{display:false} } } }
+  });
+}
+</script>
+</body>
+</html>
