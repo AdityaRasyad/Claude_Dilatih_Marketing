@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:dilatih.co)",
+      "Bash(gh repo *)",
+      "WebFetch(domain:www.chatwoot.com)"
+    ]
+  }
+}

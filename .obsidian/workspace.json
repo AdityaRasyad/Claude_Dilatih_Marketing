@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Script content/post-qris-linkedin.md",
+                "file": "marketing/blog/teknologi-asal-mula-absurd-autotune.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "post-qris-linkedin"
+              "title": "teknologi-asal-mula-absurd-autotune"
             }
           }
         ]
@@ -41,7 +41,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -185,6 +187,10 @@
   },
   "active": "72e1267f7a1cf3f3",
   "lastOpenFiles": [
+    "marketing/blog/teknologi-canggih-di-rumah.md",
+    "marketing/blog/bahasa-pemrograman-cobol.md",
+    "marketing/blog/teknologi-gps.md",
+    "Script content/post-qris-linkedin.md",
     "marketing/materials/usulan-visual-carousel-sertifikasi-ai-fresh-graduate-kompetisi-kerja.md",
     "marketing/materials/usulan-visual-carousel-sertifikasi-ai-fresh-graduate-kompetisi-kerja.md.tmp.8884.ad15e0d739f0",
     "marketing/materials/usulan-visual-story-sertifikasi-ai-fresh-graduate.md",
