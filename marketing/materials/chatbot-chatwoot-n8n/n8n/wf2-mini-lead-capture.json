@@ -1,0 +1,295 @@
+{
+  "name": "WF-2-mini — Lead Capture (MVP)",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Trigger dari WF-1",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 300],
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "notes": "Dipanggil dari WF-1-mini via node Execute Workflow. Data masuk minimal: conversationId, contactId, nama, kontak, intent, tipe, status (bot-handled/handoff), programDiminati / infoB2B / infoTechnical."
+    },
+    {
+      "id": "sticky-1",
+      "name": "Catatan — Sebelum Pakai",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 60],
+      "parameters": {
+        "content": "## Sebelum dipakai\n1. Isi node **Config**: chatwootBaseUrl, accountId, sheetId (Google Sheet `dilatih-kb`), teamNotifyNumber.\n2. Pasang credential **Chatwoot API Token** (HTTP Header Auth, header `api_access_token`) di semua node HTTP Request ke Chatwoot.\n3. Pasang credential **Google Sheets OAuth2** di kedua node Google Sheets, lalu pilih ulang tab `leads` dari dropdown.\n4. Sesuaikan node **Notifikasi Tim** — contoh ini pakai WhatsApp Cloud API, ganti kalau tim pakai email/Slack.\n5. Label yang dipasang harus SUDAH dibuat manual di Chatwoot Settings → Labels (lihat `mvp-leads-intent.md` checklist).",
+        "height": 260,
+        "width": 420
+      }
+    },
+    {
+      "id": "config",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 300],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "a1", "name": "chatwootBaseUrl", "type": "string", "value": "https://GANTI-DENGAN-URL-CHATWOOT" },
+            { "id": "a2", "name": "accountId", "type": "string", "value": "GANTI-DENGAN-ACCOUNT-ID" },
+            { "id": "a3", "name": "sheetId", "type": "string", "value": "GANTI-DENGAN-GOOGLE-SHEET-ID" },
+            { "id": "a4", "name": "teamNotifyNumber", "type": "string", "value": "62GANTINOMORWA" }
+          ]
+        },
+        "options": { "keepOnlySet": false }
+      }
+    },
+    {
+      "id": "lookup",
+      "name": "Cek Baris Existing",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [440, 300],
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "mode": "id", "value": "={{ $json.sheetId }}" },
+        "sheetName": { "__rl": true, "mode": "list", "value": "leads", "cachedResultName": "leads" },
+        "filtersUI": {
+          "values": [
+            { "lookupColumn": "conversation_id", "lookupValue": "={{ $('Trigger dari WF-1').item.json.conversationId }}" }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Sesuaikan lagi mapping kolom lewat dropdown n8n setelah import — JSON ini cuma titik awal."
+    },
+    {
+      "id": "if-exists",
+      "name": "Baris Sudah Ada?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, 300],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.row_number }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "update-row",
+      "name": "Update Baris",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [880, 180],
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "mode": "id", "value": "={{ $('Config').item.json.sheetId }}" },
+        "sheetName": { "__rl": true, "mode": "list", "value": "leads", "cachedResultName": "leads" },
+        "columns": {
+          "matchingColumns": ["conversation_id"],
+          "value": {
+            "conversation_id": "={{ $('Trigger dari WF-1').item.json.conversationId }}",
+            "nama": "={{ $('Trigger dari WF-1').item.json.nama }}",
+            "kontak": "={{ $('Trigger dari WF-1').item.json.kontak }}",
+            "intent": "={{ $('Trigger dari WF-1').item.json.intent }}",
+            "tipe": "={{ $('Trigger dari WF-1').item.json.tipe }}",
+            "program_diminati": "={{ $('Trigger dari WF-1').item.json.programDiminati || $('Trigger dari WF-1').item.json.infoB2B || $('Trigger dari WF-1').item.json.infoTechnical || '' }}",
+            "status": "={{ $('Trigger dari WF-1').item.json.status }}",
+            "timestamp": "={{ $now.toISO() }}"
+          }
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "append-row",
+      "name": "Tambah Baris",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [880, 420],
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "mode": "id", "value": "={{ $('Config').item.json.sheetId }}" },
+        "sheetName": { "__rl": true, "mode": "list", "value": "leads", "cachedResultName": "leads" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "conversation_id": "={{ $('Trigger dari WF-1').item.json.conversationId }}",
+            "nama": "={{ $('Trigger dari WF-1').item.json.nama }}",
+            "kontak": "={{ $('Trigger dari WF-1').item.json.kontak }}",
+            "intent": "={{ $('Trigger dari WF-1').item.json.intent }}",
+            "tipe": "={{ $('Trigger dari WF-1').item.json.tipe }}",
+            "program_diminati": "={{ $('Trigger dari WF-1').item.json.programDiminati || $('Trigger dari WF-1').item.json.infoB2B || $('Trigger dari WF-1').item.json.infoTechnical || '' }}",
+            "status": "={{ $('Trigger dari WF-1').item.json.status }}",
+            "timestamp": "={{ $now.toISO() }}"
+          }
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "hitung-label",
+      "name": "Hitung Label",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 300],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const src = $('Trigger dari WF-1').item.json;\n\nconst labels = [];\nif (src.intent) labels.push('intent:' + src.intent);\nif (src.tipe) labels.push('tipe:' + src.tipe);\nif (src.status === 'bot-handled') labels.push('bot-handled');\nif (src.status === 'handoff') labels.push('human-takeover');\n\nreturn { json: { ...src, labels } };"
+      }
+    },
+    {
+      "id": "pasang-label",
+      "name": "Pasang Label ke Chatwoot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/conversations/{{ $json.conversationId }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ labels: $json.labels }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" }
+      }
+    },
+    {
+      "id": "tentukan-prioritas",
+      "name": "Tentukan Prioritas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 300],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const intent = $json.intent;\nlet priority = 'none';\n\nif (intent === 'technical' || intent === 'iht-b2b') priority = 'high';\nelse if (intent === 'lain') priority = 'medium';\n// bnsp/workshop yang bot-handled sengaja tidak diberi prioritas (tidak masuk antrean handoff)\n\nreturn { json: { ...$json, priority } };"
+      }
+    },
+    {
+      "id": "if-ada-prioritas",
+      "name": "Ada Prioritas?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1760, 300],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            { "id": "c1", "leftValue": "={{ $json.priority }}", "rightValue": "none", "operator": { "type": "string", "operation": "notEquals" } }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "set-prioritas",
+      "name": "Set Prioritas Chatwoot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1980, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/conversations/{{ $json.conversationId }}/toggle_priority",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ priority: $json.priority }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" }
+      }
+    },
+    {
+      "id": "if-high",
+      "name": "Prioritas High?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [2200, 200],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            { "id": "c1", "leftValue": "={{ $json.priority }}", "rightValue": "high", "operator": { "type": "string", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "notif-tim",
+      "name": "Notifikasi Tim (WhatsApp)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2420, 100],
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/GANTI-PHONE-NUMBER-ID/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: $('Config').item.json.teamNotifyNumber, type: 'text', text: { body: `Lead prioritas tinggi: ${$json.nama || '(tanpa nama)'} — ${$json.kontak || ''}\\nIntent: ${$json.intent}\\nInfo: ${$json.programDiminati || $json.infoB2B || $json.infoTechnical || '-'}\\nPercakapan: ${$('Config').item.json.chatwootBaseUrl}/app/accounts/${$('Config').item.json.accountId}/conversations/${$json.conversationId}` } }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": { "id": "", "name": "WhatsApp Cloud API Token" }
+      },
+      "notes": "Ganti node ini kalau tim pakai email/Slack, bukan WhatsApp Cloud API — logikanya (kapan dipanggil) tidak berubah."
+    },
+    {
+      "id": "selesai",
+      "name": "Selesai",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [2640, 300],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Trigger dari WF-1": { "main": [[{ "node": "Config", "type": "main", "index": 0 }]] },
+    "Config": { "main": [[{ "node": "Cek Baris Existing", "type": "main", "index": 0 }]] },
+    "Cek Baris Existing": { "main": [[{ "node": "Baris Sudah Ada?", "type": "main", "index": 0 }]] },
+    "Baris Sudah Ada?": {
+      "main": [
+        [{ "node": "Update Baris", "type": "main", "index": 0 }],
+        [{ "node": "Tambah Baris", "type": "main", "index": 0 }]
+      ]
+    },
+    "Update Baris": { "main": [[{ "node": "Hitung Label", "type": "main", "index": 0 }]] },
+    "Tambah Baris": { "main": [[{ "node": "Hitung Label", "type": "main", "index": 0 }]] },
+    "Hitung Label": { "main": [[{ "node": "Pasang Label ke Chatwoot", "type": "main", "index": 0 }]] },
+    "Pasang Label ke Chatwoot": { "main": [[{ "node": "Tentukan Prioritas", "type": "main", "index": 0 }]] },
+    "Tentukan Prioritas": { "main": [[{ "node": "Ada Prioritas?", "type": "main", "index": 0 }]] },
+    "Ada Prioritas?": {
+      "main": [
+        [{ "node": "Set Prioritas Chatwoot", "type": "main", "index": 0 }],
+        [{ "node": "Selesai", "type": "main", "index": 0 }]
+      ]
+    },
+    "Set Prioritas Chatwoot": { "main": [[{ "node": "Prioritas High?", "type": "main", "index": 0 }]] },
+    "Prioritas High?": {
+      "main": [
+        [{ "node": "Notifikasi Tim (WhatsApp)", "type": "main", "index": 0 }],
+        [{ "node": "Selesai", "type": "main", "index": 0 }]
+      ]
+    },
+    "Notifikasi Tim (WhatsApp)": { "main": [[{ "node": "Selesai", "type": "main", "index": 0 }]] }
+  },
+  "pinData": {},
+  "meta": { "instanceId": "dilatih-mvp" }
+}

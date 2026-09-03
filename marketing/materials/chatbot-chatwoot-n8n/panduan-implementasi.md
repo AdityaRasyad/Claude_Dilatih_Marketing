@@ -37,7 +37,7 @@
 Tujuan fase ini: bot bisa jalan dan sudah memberi nilai (jawab pertanyaan dasar + label + prioritas) sebelum AI Agent disentuh sama sekali — ini yang bikin rollout `keputusan-dan-arsitektur.md` §7 minggu 1 punya risiko rendah.
 
 - [ ] **2.1** Di n8n, buat kredensial **Chatwoot API** (pakai token dari 0.1) dan **Google Sheets** (service account dengan akses ke `dilatih-kb`, dari 1.2).
-- [ ] **2.2** Bangun **Webhook Trigger** (Node 1) — di Chatwoot: Settings → Integrations → Webhook, event `message_created`, arahkan ke URL produksi n8n (bukan test URL). Rujuk `spesifikasi-workflow-n8n.md` WF-1 Node 1.
+- [x] **2.2** Bangun **Webhook Trigger** (Node 1) — di Chatwoot: Settings → Integrations → Webhook, event `message_created`, arahkan ke URL produksi n8n (bukan test URL). Rujuk `spesifikasi-workflow-n8n.md` WF-1 Node 1.
 - [ ] **2.3** Bangun **Node 2 (Filter)** dan **Node 3 (Dedupe)** — guard dasar sebelum apa pun lain jalan. Detail kondisi ada di spesifikasi WF-1.
 - [ ] **2.4** Bangun **Node 4 (cek state)** dan **Node 5 (switch baru/lanjutan)** — kirim sapaan + menu 5 pilihan (teks di `copy-percakapan.md` §1) saat percakapan baru.
 - [ ] **2.5** Bangun **Node 6a (jawaban deterministik)** untuk jalur 1 (BNSP) dan jalur 2 (Workshop) — baca tab `program`/`faq`, susun jawaban dari template `copy-percakapan.md` §2–§3. **Belum ada LLM di sini.**

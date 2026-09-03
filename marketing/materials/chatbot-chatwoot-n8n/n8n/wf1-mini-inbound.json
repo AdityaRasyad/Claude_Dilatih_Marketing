@@ -1,0 +1,481 @@
+{
+  "name": "WF-1-mini — Inbound Handler (MVP)",
+  "nodes": [
+    {
+      "id": "sticky-1",
+      "name": "Catatan — Sebelum Pakai",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-20, -260],
+      "parameters": {
+        "content": "## Sebelum dipakai\n1. Import `wf2-mini-lead-capture.json` LEBIH DULU, aktifkan workflow-nya.\n2. Isi node **Config** (chatwootBaseUrl, accountId, sheetId).\n3. Di setiap node **Panggil WF-2-mini**, buka dropdown workflow dan pilih ulang WF-2-mini (ID lama tidak akan cocok di instance ini).\n4. Aktifkan webhook di Chatwoot: Settings → Integrations → Webhook, event `message_created`, arahkan ke URL produksi node **Webhook Chatwoot** di bawah.\n5. **Path payload webhook (`$json.body....`) adalah asumsi berdasarkan dokumentasi internal — cek payload asli lewat satu kali tes kirim pesan, sesuaikan path di node Filter/Code kalau berbeda.**\n6. Semua label yang dipasang lewat WF-2-mini harus sudah dibuat manual di Chatwoot Settings → Labels.",
+        "height": 300,
+        "width": 460
+      }
+    },
+    {
+      "id": "webhook",
+      "name": "Webhook Chatwoot",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-20, 60],
+      "webhookId": "dilatih-chatbot-inbound",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "dilatih-chatbot-inbound",
+        "responseMode": "onReceived",
+        "options": {}
+      }
+    },
+    {
+      "id": "config",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [200, 60],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "a1", "name": "chatwootBaseUrl", "type": "string", "value": "https://GANTI-DENGAN-URL-CHATWOOT" },
+            { "id": "a2", "name": "accountId", "type": "string", "value": "GANTI-DENGAN-ACCOUNT-ID" },
+            { "id": "a3", "name": "sheetId", "type": "string", "value": "GANTI-DENGAN-GOOGLE-SHEET-ID" }
+          ]
+        },
+        "options": { "keepOnlySet": false }
+      }
+    },
+    {
+      "id": "filter",
+      "name": "Filter Pesan Valid",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [420, 60],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "combinator": "and",
+          "conditions": [
+            { "id": "c1", "leftValue": "={{ $json.body.message_type }}", "rightValue": "incoming", "operator": { "type": "string", "operation": "equals" } },
+            { "id": "c2", "leftValue": "={{ $json.body.sender && $json.body.sender.type }}", "rightValue": "contact", "operator": { "type": "string", "operation": "equals" } },
+            { "id": "c3", "leftValue": "={{ ($json.body.conversation.labels || []).includes('bot-off') || ($json.body.conversation.labels || []).includes('human-takeover') }}", "rightValue": "true", "operator": { "type": "string", "operation": "notEquals" } },
+            { "id": "c4", "leftValue": "={{ $json.body.conversation.assignee_id }}", "rightValue": "", "operator": { "type": "string", "operation": "equals" } }
+          ]
+        }
+      }
+    },
+    {
+      "id": "stop-invalid",
+      "name": "Stop — Bukan Pesan Valid",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [640, 220],
+      "parameters": {}
+    },
+    {
+      "id": "dedupe",
+      "name": "Dedupe",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 60],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.processedIds) staticData.processedIds = [];\n\nconst out = [];\nfor (const item of items) {\n  const msgId = item.json.body.message && item.json.body.message.id;\n  if (msgId && staticData.processedIds.includes(msgId)) continue; // sudah diproses, skip\n  if (msgId) staticData.processedIds.push(msgId);\n  if (staticData.processedIds.length > 500) staticData.processedIds = staticData.processedIds.slice(-500);\n  out.push(item);\n}\nreturn out;"
+      },
+      "notes": "Kalau item ini duplikat, node ini tidak meneruskan apa pun — cabang berhenti secara alami, tidak perlu node stop terpisah."
+    },
+    {
+      "id": "get-contact",
+      "name": "Ambil Data Kontak",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [860, 60],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/contacts/{{ $json.body.contact.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } }
+    },
+    {
+      "id": "route",
+      "name": "Baru vs Menu vs Bebas",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [1080, 60],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "baru",
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+                "combinator": "and",
+                "conditions": [
+                  { "id": "r1", "leftValue": "={{ $json.custom_attributes && $json.custom_attributes.bot_state }}", "rightValue": "", "operator": { "type": "string", "operation": "equals" } }
+                ]
+              }
+            },
+            {
+              "outputKey": "menu",
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+                "combinator": "and",
+                "conditions": [
+                  { "id": "r2", "leftValue": "={{ $json.custom_attributes && $json.custom_attributes.bot_state }}", "rightValue": "menunggu_pilihan", "operator": { "type": "string", "operation": "equals" } }
+                ]
+              }
+            },
+            {
+              "outputKey": "bebas",
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+                "combinator": "and",
+                "conditions": [
+                  { "id": "r3", "leftValue": "={{ true }}", "rightValue": "true", "operator": { "type": "string", "operation": "equals" } }
+                ]
+              }
+            }
+          ]
+        },
+        "options": { "fallbackOutput": "bebas" }
+      },
+      "notes": "3 output: baru (kirim menu) / menu (user baru pilih 1-4) / bebas (teks bebas, langsung handoff — tidak ada AI di MVP)."
+    },
+    {
+      "id": "kirim-menu",
+      "name": "Kirim Menu 4 Pilihan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1300, -140],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/conversations/{{ $('Webhook Chatwoot').item.json.body.conversation.id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ content: 'Halo! Ada yang bisa kami bantu?\\n1. Sertifikasi BNSP\\n2. Workshop & sertifikasi umum\\n3. Pelatihan untuk perusahaan (B2B/IHT)\\n4. Saya sudah terdaftar — ada kendala\\n\\nBalas dengan angka pilihan ya.', message_type: 'outgoing' }) }}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } },
+      "notes": "Teks final ambil dari copy-percakapan.md §1, ini cuma placeholder."
+    },
+    {
+      "id": "set-menunggu",
+      "name": "Set bot_state=menunggu_pilihan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1520, -140],
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/contacts/{{ $('Webhook Chatwoot').item.json.body.contact.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ custom_attributes: { bot_state: 'menunggu_pilihan' } }) }}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } }
+    },
+    {
+      "id": "route-pilihan",
+      "name": "Route Pilihan Menu",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [1300, 60],
+      "parameters": {
+        "rules": {
+          "values": [
+            { "outputKey": "1-bnsp", "conditions": { "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" }, "combinator": "and", "conditions": [{ "id": "p1", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.message.content.trim() }}", "rightValue": "1", "operator": { "type": "string", "operation": "equals" } }] } },
+            { "outputKey": "2-workshop", "conditions": { "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" }, "combinator": "and", "conditions": [{ "id": "p2", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.message.content.trim() }}", "rightValue": "2", "operator": { "type": "string", "operation": "equals" } }] } },
+            { "outputKey": "3-b2b", "conditions": { "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" }, "combinator": "and", "conditions": [{ "id": "p3", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.message.content.trim() }}", "rightValue": "3", "operator": { "type": "string", "operation": "equals" } }] } },
+            { "outputKey": "4-technical", "conditions": { "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" }, "combinator": "and", "conditions": [{ "id": "p4", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.message.content.trim() }}", "rightValue": "4", "operator": { "type": "string", "operation": "equals" } }] } }
+          ]
+        },
+        "options": { "fallbackOutput": "extra" }
+      },
+      "notes": "Output 'extra' (angka tidak dikenali) tidak disambungkan — pesan diabaikan sampai user membalas 1-4. Bisa disambungkan ke Kirim Menu lagi kalau mau re-prompt."
+    },
+    {
+      "id": "set-jalur-bnsp",
+      "name": "Set Jalur=bnsp",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1520, -20],
+      "parameters": {
+        "assignments": { "assignments": [{ "id": "j1", "name": "jalur", "type": "string", "value": "bnsp" }] },
+        "options": { "keepOnlySet": false }
+      }
+    },
+    {
+      "id": "set-jalur-workshop",
+      "name": "Set Jalur=workshop",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1520, 60],
+      "parameters": {
+        "assignments": { "assignments": [{ "id": "j2", "name": "jalur", "type": "string", "value": "workshop" }] },
+        "options": { "keepOnlySet": false }
+      }
+    },
+    {
+      "id": "baca-program-faq",
+      "name": "Baca Program & FAQ",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1740, 20],
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "mode": "id", "value": "={{ $('Config').item.json.sheetId }}" },
+        "sheetName": { "__rl": true, "mode": "list", "value": "program", "cachedResultName": "program" },
+        "filtersUI": { "values": [{ "lookupColumn": "jalur", "lookupValue": "={{ $json.jalur }}" }] },
+        "options": {}
+      },
+      "notes": "Baca tab program (dan faq bila perlu) sesuai jalur — sesuaikan mapping kolom setelah import."
+    },
+    {
+      "id": "susun-jawaban",
+      "name": "Susun Jawaban",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1960, 20],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "// Susun teks jawaban dari baris program/faq yang terbaca.\n// Placeholder — ganti sesuai template resmi di copy-percakapan.md §2-3.\nconst jalur = items[0]?.json?.jalur || 'bnsp';\nconst daftarProgram = items.map(i => `- ${i.json.nama || i.json.ringkasan || '(tanpa nama)'}`).join('\\n');\nconst jawaban = daftarProgram\n  ? `Berikut program ${jalur} yang tersedia:\\n${daftarProgram}\\n\\nAda yang mau ditanyakan lebih lanjut?`\n  : `Untuk saat ini kami belum punya info lengkap soal ${jalur}, tim kami akan bantu langsung ya.`;\nreturn [{ json: { jalur, jawaban } }];"
+      }
+    },
+    {
+      "id": "kirim-jawaban",
+      "name": "Kirim Jawaban",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2180, 20],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/conversations/{{ $('Webhook Chatwoot').item.json.body.conversation.id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ content: $json.jawaban, message_type: 'outgoing' }) }}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } }
+    },
+    {
+      "id": "reset-bot-state",
+      "name": "Set bot_state=bebas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2400, 20],
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/contacts/{{ $('Webhook Chatwoot').item.json.body.contact.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ custom_attributes: { bot_state: 'bebas' } }) }}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } }
+    },
+    {
+      "id": "wf2-bnsp",
+      "name": "Panggil WF-2-mini (bot-handled)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [2620, 20],
+      "parameters": {
+        "source": "database",
+        "workflowId": { "__rl": true, "mode": "list", "value": "", "cachedResultName": "WF-2-mini — Lead Capture (MVP)" },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "conversationId": "={{ $('Webhook Chatwoot').item.json.body.conversation.id }}",
+            "contactId": "={{ $('Webhook Chatwoot').item.json.body.contact.id }}",
+            "nama": "={{ $('Webhook Chatwoot').item.json.body.contact.name }}",
+            "kontak": "={{ $('Webhook Chatwoot').item.json.body.contact.phone_number || $('Webhook Chatwoot').item.json.body.contact.email }}",
+            "intent": "={{ $('Susun Jawaban').item.json.jalur }}",
+            "tipe": "individu",
+            "status": "bot-handled",
+            "programDiminati": "={{ $('Susun Jawaban').item.json.jawaban }}"
+          }
+        }
+      },
+      "notes": "Pilih ulang workflow WF-2-mini dari dropdown setelah kedua workflow diimport."
+    },
+    {
+      "id": "kirim-tanya-b2b",
+      "name": "Kirim Pertanyaan B2B",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1520, 180],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/conversations/{{ $('Webhook Chatwoot').item.json.body.conversation.id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ content: 'Boleh dibantu info: nama perusahaan, perkiraan jumlah peserta, dan program BNSP atau non-BNSP yang diminati? Tim kami akan segera follow up.', message_type: 'outgoing' }) }}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } }
+    },
+    {
+      "id": "wf2-b2b",
+      "name": "Panggil WF-2-mini (handoff-b2b)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [1740, 180],
+      "parameters": {
+        "source": "database",
+        "workflowId": { "__rl": true, "mode": "list", "value": "", "cachedResultName": "WF-2-mini — Lead Capture (MVP)" },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "conversationId": "={{ $('Webhook Chatwoot').item.json.body.conversation.id }}",
+            "contactId": "={{ $('Webhook Chatwoot').item.json.body.contact.id }}",
+            "nama": "={{ $('Webhook Chatwoot').item.json.body.contact.name }}",
+            "kontak": "={{ $('Webhook Chatwoot').item.json.body.contact.phone_number || $('Webhook Chatwoot').item.json.body.contact.email }}",
+            "intent": "iht-b2b",
+            "tipe": "korporat",
+            "status": "handoff",
+            "infoB2B": "={{ 'Menunggu balasan detail dari calon peserta (dikumpulkan manual oleh agent saat follow up).' }}"
+          }
+        }
+      },
+      "notes": "MVP tidak menunggu balasan detail user dalam workflow ini (butuh percabangan giliran-per-giliran) — cukup catat 'ada minat B2B' dan biarkan agent menggali detail saat follow up. Bisa ditingkatkan nanti."
+    },
+    {
+      "id": "kirim-tanya-technical",
+      "name": "Kirim Pertanyaan Technical",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1520, 320],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/conversations/{{ $('Webhook Chatwoot').item.json.body.conversation.id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ content: 'Ceritakan kendalanya ya, tim kami akan bantu langsung.', message_type: 'outgoing' }) }}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } }
+    },
+    {
+      "id": "wf2-technical",
+      "name": "Panggil WF-2-mini (handoff-technical)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [1740, 320],
+      "parameters": {
+        "source": "database",
+        "workflowId": { "__rl": true, "mode": "list", "value": "", "cachedResultName": "WF-2-mini — Lead Capture (MVP)" },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "conversationId": "={{ $('Webhook Chatwoot').item.json.body.conversation.id }}",
+            "contactId": "={{ $('Webhook Chatwoot').item.json.body.contact.id }}",
+            "nama": "={{ $('Webhook Chatwoot').item.json.body.contact.name }}",
+            "kontak": "={{ $('Webhook Chatwoot').item.json.body.contact.phone_number || $('Webhook Chatwoot').item.json.body.contact.email }}",
+            "intent": "technical",
+            "tipe": "peserta-aktif",
+            "status": "handoff",
+            "infoTechnical": "={{ 'Menunggu balasan detail kendala dari peserta (dikumpulkan manual oleh agent saat follow up).' }}"
+          }
+        }
+      }
+    },
+    {
+      "id": "kirim-fallback",
+      "name": "Kirim Pesan Fallback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1300, 220],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/conversations/{{ $('Webhook Chatwoot').item.json.body.conversation.id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ content: 'Terima kasih, tim kami akan segera membalas.', message_type: 'outgoing' }) }}",
+        "options": {}
+      },
+      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } },
+      "notes": "Cabang teks bebas (bot_state=bebas) — MVP tidak punya AI, jadi langsung handoff, tidak mencoba menjawab."
+    },
+    {
+      "id": "wf2-lain",
+      "name": "Panggil WF-2-mini (handoff-lain)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [1520, 220],
+      "parameters": {
+        "source": "database",
+        "workflowId": { "__rl": true, "mode": "list", "value": "", "cachedResultName": "WF-2-mini — Lead Capture (MVP)" },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "conversationId": "={{ $('Webhook Chatwoot').item.json.body.conversation.id }}",
+            "contactId": "={{ $('Webhook Chatwoot').item.json.body.contact.id }}",
+            "nama": "={{ $('Webhook Chatwoot').item.json.body.contact.name }}",
+            "kontak": "={{ $('Webhook Chatwoot').item.json.body.contact.phone_number || $('Webhook Chatwoot').item.json.body.contact.email }}",
+            "intent": "lain",
+            "tipe": "individu",
+            "status": "handoff",
+            "programDiminati": "={{ $('Webhook Chatwoot').item.json.body.message.content }}"
+          }
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Chatwoot": { "main": [[{ "node": "Config", "type": "main", "index": 0 }]] },
+    "Config": { "main": [[{ "node": "Filter Pesan Valid", "type": "main", "index": 0 }]] },
+    "Filter Pesan Valid": {
+      "main": [
+        [{ "node": "Dedupe", "type": "main", "index": 0 }],
+        [{ "node": "Stop — Bukan Pesan Valid", "type": "main", "index": 0 }]
+      ]
+    },
+    "Dedupe": { "main": [[{ "node": "Ambil Data Kontak", "type": "main", "index": 0 }]] },
+    "Ambil Data Kontak": { "main": [[{ "node": "Baru vs Menu vs Bebas", "type": "main", "index": 0 }]] },
+    "Baru vs Menu vs Bebas": {
+      "main": [
+        [{ "node": "Kirim Menu 4 Pilihan", "type": "main", "index": 0 }],
+        [{ "node": "Route Pilihan Menu", "type": "main", "index": 0 }],
+        [{ "node": "Kirim Pesan Fallback", "type": "main", "index": 0 }]
+      ]
+    },
+    "Kirim Menu 4 Pilihan": { "main": [[{ "node": "Set bot_state=menunggu_pilihan", "type": "main", "index": 0 }]] },
+    "Route Pilihan Menu": {
+      "main": [
+        [{ "node": "Set Jalur=bnsp", "type": "main", "index": 0 }],
+        [{ "node": "Set Jalur=workshop", "type": "main", "index": 0 }],
+        [{ "node": "Kirim Pertanyaan B2B", "type": "main", "index": 0 }],
+        [{ "node": "Kirim Pertanyaan Technical", "type": "main", "index": 0 }]
+      ]
+    },
+    "Set Jalur=bnsp": { "main": [[{ "node": "Baca Program & FAQ", "type": "main", "index": 0 }]] },
+    "Set Jalur=workshop": { "main": [[{ "node": "Baca Program & FAQ", "type": "main", "index": 0 }]] },
+    "Baca Program & FAQ": { "main": [[{ "node": "Susun Jawaban", "type": "main", "index": 0 }]] },
+    "Susun Jawaban": { "main": [[{ "node": "Kirim Jawaban", "type": "main", "index": 0 }]] },
+    "Kirim Jawaban": { "main": [[{ "node": "Set bot_state=bebas", "type": "main", "index": 0 }]] },
+    "Set bot_state=bebas": { "main": [[{ "node": "Panggil WF-2-mini (bot-handled)", "type": "main", "index": 0 }]] },
+    "Kirim Pertanyaan B2B": { "main": [[{ "node": "Panggil WF-2-mini (handoff-b2b)", "type": "main", "index": 0 }]] },
+    "Kirim Pertanyaan Technical": { "main": [[{ "node": "Panggil WF-2-mini (handoff-technical)", "type": "main", "index": 0 }]] },
+    "Kirim Pesan Fallback": { "main": [[{ "node": "Panggil WF-2-mini (handoff-lain)", "type": "main", "index": 0 }]] }
+  },
+  "pinData": {},
+  "meta": { "instanceId": "dilatih-mvp" }
+}
