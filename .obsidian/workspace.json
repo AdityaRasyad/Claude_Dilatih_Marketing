@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Script content/post-qris-linkedin.md",
+                "file": "marketing/blog/data-center-pemanas-rumah-eropa.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "post-qris-linkedin"
+              "title": "data-center-pemanas-rumah-eropa"
             }
           }
         ]
@@ -41,7 +41,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -185,6 +187,14 @@
   },
   "active": "72e1267f7a1cf3f3",
   "lastOpenFiles": [
+    "marketing/blog/incognito-mode.md",
+    "marketing/blog/incognito-mode.md.tmp.21828.6a97b47423ae",
+    "marketing/blog/incognito-mode.md.tmp.21828.775b3d25fea1",
+    "marketing/blog/incognito-mode.md.tmp.21828.a23e5fcc5436",
+    "marketing/blog/incognito-mode.md.tmp.21828.ba2b6179e963",
+    "marketing/blog/incognito-mode.md.tmp.21828.a83504c58035",
+    "marketing/blog/incognito-mode.md.tmp.21828.0ba91a2097ef",
+    "Script content/post-qris-linkedin.md",
     "marketing/materials/carousel-sertifikasi-ai-hr-b2b.md",
     "marketing/materials/carousel-sertifikasi-ai-hr-b2b.md.tmp.15584.d8b549b56635",
     "marketing/materials/carousel-sertifikasi-ai-professional.md",
@@ -194,14 +204,8 @@
     "marketing/materials/usulan-visual-story-sertifikasi-ai-fresh-graduate.md",
     "marketing/materials/usulan-visual-story-sertifikasi-ai-fresh-graduate.md.tmp.8884.3913c4d1df41",
     "marketing/materials/usulan-visual-carousel-sertifikasi-ai-fresh-graduate.md",
-    "marketing/materials/usulan-visual-carousel-sertifikasi-ai-fresh-graduate.md.tmp.8884.5e4046687fc4",
-    "marketing/materials",
-    "marketing/plan.md.tmp.8884.2bb16a3d41a3",
     "marketing/brand-voice.md",
     "marketing/plan.md",
-    "marketing/plan.md.tmp.17284.4df75cdc68b6",
-    "marketing/plan.md.tmp.17284.b1327dae6fad",
-    "marketing/plan.md.tmp.17284.de3ce860f42b",
     "CLAUDE.md"
   ]
 }
