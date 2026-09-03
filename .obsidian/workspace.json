@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "marketing/blog/data-center-pemanas-rumah-eropa.md",
+                "file": "marketing/materials/chatbot-chatwoot-n8n/panduan-implementasi.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "data-center-pemanas-rumah-eropa"
+              "title": "panduan-implementasi"
             }
           }
         ]
@@ -187,22 +187,30 @@
   },
   "active": "72e1267f7a1cf3f3",
   "lastOpenFiles": [
-    "marketing/blog/incognito-mode.md",
-    "marketing/blog/incognito-mode.md.tmp.21828.6a97b47423ae",
-    "marketing/blog/incognito-mode.md.tmp.21828.775b3d25fea1",
-    "marketing/blog/incognito-mode.md.tmp.21828.a23e5fcc5436",
-    "marketing/blog/incognito-mode.md.tmp.21828.ba2b6179e963",
-    "marketing/blog/incognito-mode.md.tmp.21828.a83504c58035",
-    "marketing/blog/incognito-mode.md.tmp.21828.0ba91a2097ef",
-    "Script content/post-qris-linkedin.md",
+    "marketing/materials/chatbot-chatwoot-n8n/spesifikasi-workflow-n8n.md",
+    "marketing/materials/chatbot-chatwoot-n8n/keputusan-dan-arsitektur.md.tmp.11776.e5226f113114",
+    "marketing/materials/chatbot-chatwoot-n8n/panduan-implementasi.md",
+    "marketing/materials/chatbot-chatwoot-n8n/panduan-implementasi.md.tmp.11776.d8edddbedf42",
+    "marketing/materials/chatbot-chatwoot-n8n/spesifikasi-workflow-n8n.md.tmp.11776.89164057f52d",
+    "marketing/materials/chatbot-chatwoot-n8n/spesifikasi-workflow-n8n.md.tmp.11776.db263a33e7da",
+    "marketing/materials/chatbot-chatwoot-n8n/labelling-dan-prioritas.md.tmp.11776.c1f1dceab8be",
+    "marketing/materials/chatbot-chatwoot-n8n/labelling-dan-prioritas.md.tmp.11776.39f45e434508",
+    "marketing/materials/chatbot-chatwoot-n8n/labelling-dan-prioritas.md.tmp.11776.de76e499a501",
+    "marketing/materials/chatbot-chatwoot-n8n/labelling-dan-prioritas.md.tmp.11776.6817d2c3c71b",
+    "marketing/materials/chatbot-chatwoot-n8n/knowledge-base-template.md.tmp.11776.6ffad3bbd64f",
+    "marketing/materials/chatbot-chatwoot-n8n/knowledge-base-template.md.tmp.11776.9c2ceec44192",
+    "marketing/materials/chatbot-chatwoot-n8n/system-prompt-bot.md",
+    "marketing/materials/chatbot-chatwoot-n8n/labelling-dan-prioritas.md",
+    "marketing/materials/chatbot-chatwoot-n8n/keputusan-dan-arsitektur.md",
+    "marketing/materials/chatbot-chatwoot-n8n/knowledge-base-template.md",
+    "marketing/materials/chatbot-chatwoot-n8n/copy-percakapan.md",
     "marketing/materials/carousel-sertifikasi-ai-hr-b2b.md",
-    "marketing/materials/carousel-sertifikasi-ai-hr-b2b.md.tmp.15584.d8b549b56635",
+    "marketing/blog/data-center-pemanas-rumah-eropa.md",
+    "marketing/blog/incognito-mode.md",
+    "Script content/post-qris-linkedin.md",
     "marketing/materials/carousel-sertifikasi-ai-professional.md",
-    "marketing/materials/carousel-sertifikasi-ai-professional.md.tmp.15584.2f2ad4cea9d3",
     "marketing/materials/usulan-visual-carousel-sertifikasi-ai-fresh-graduate-kompetisi-kerja.md",
-    "marketing/materials/usulan-visual-carousel-sertifikasi-ai-fresh-graduate-kompetisi-kerja.md.tmp.8884.ad15e0d739f0",
     "marketing/materials/usulan-visual-story-sertifikasi-ai-fresh-graduate.md",
-    "marketing/materials/usulan-visual-story-sertifikasi-ai-fresh-graduate.md.tmp.8884.3913c4d1df41",
     "marketing/materials/usulan-visual-carousel-sertifikasi-ai-fresh-graduate.md",
     "marketing/brand-voice.md",
     "marketing/plan.md",
