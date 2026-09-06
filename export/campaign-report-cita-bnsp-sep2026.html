@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaign Report — CITA BNSP · September 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 13px;
+    color: #1a1a2e;
+    background: #ffffff;
+    line-height: 1.6;
+  }
+
+  /* Cover */
+  .cover {
+    background: #1a1a2e;
+    color: white;
+    padding: 60px 56px 48px;
+    min-height: 220px;
+    position: relative;
+    page-break-after: avoid;
+  }
+  .cover-logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 40px;
+  }
+  .cover-logo span { color: #f97316; }
+  .cover-badge {
+    display: inline-block;
+    background: #e91e8c;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .cover h1 {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+  .cover-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 36px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .cover-meta-item { }
+  .cover-meta-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 2px;
+  }
+  .cover-meta-value {
+    font-size: 13px;
+    color: white;
+    font-weight: 600;
+  }
+  .cover-accent {
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: linear-gradient(180deg, #f97316, #e91e8c);
+  }
+
+  /* Content */
+  .content {
+    padding: 40px 56px;
+    max-width: 800px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 36px;
+    page-break-inside: avoid;
+  }
+  .section-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #f97316;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #f97316;
+  }
+
+  /* Summary cards */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .summary-card {
+    background: #f8f8ff;
+    border: 1px solid #e8e8f5;
+    border-radius: 8px;
+    padding: 16px 14px;
+  }
+  .summary-card .label {
+    font-size: 10px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .summary-card .value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    line-height: 1.2;
+  }
+  .summary-card .value.accent { color: #e91e8c; }
+  .summary-card .sub {
+    font-size: 11px;
+    color: #666;
+    margin-top: 2px;
+  }
+
+  /* Highlight box */
+  .highlight-box {
+    background: #fff8f0;
+    border-left: 4px solid #f97316;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+  }
+  .highlight-box p {
+    font-size: 13px;
+    color: #3a3a5a;
+  }
+  .highlight-box strong { color: #1a1a2e; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+  thead th {
+    background: #1a1a2e;
+    color: white;
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  tbody tr:nth-child(even) { background: #f7f7fc; }
+  tbody td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #e8e8f5;
+    vertical-align: top;
+  }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .tag-green { background: #d1fae5; color: #065f46; }
+  .tag-orange { background: #fff3e0; color: #92400e; }
+  .tag-pink { background: #fce7f3; color: #9d174d; }
+  .tag-blue { background: #eff6ff; color: #1e40af; }
+
+  /* Copy block */
+  .copy-block {
+    background: #f1f1f8;
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #1a1a2e;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .copy-label {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #888;
+    margin-bottom: 6px;
+  }
+
+  /* Checklist */
+  .checklist {
+    list-style: none;
+    margin-bottom: 16px;
+  }
+  .checklist li {
+    padding: 7px 0;
+    border-bottom: 1px solid #f0f0f8;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12.5px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check-box {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .check-box.done {
+    background: #059669;
+    border-color: #059669;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 10px;
+  }
+  .checklist-group {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #f97316;
+    margin: 14px 0 4px;
+  }
+
+  /* Timeline */
+  .timeline {
+    border-left: 3px solid #e8e8f5;
+    padding-left: 20px;
+    margin-left: 8px;
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: -27px;
+    top: 3px;
+    width: 11px;
+    height: 11px;
+    background: #f97316;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #f97316;
+  }
+  .timeline-date {
+    font-size: 11px;
+    font-weight: 700;
+    color: #f97316;
+    margin-bottom: 4px;
+  }
+  .timeline-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+  }
+  .timeline-body {
+    font-size: 12px;
+    color: #555;
+    line-height: 1.5;
+  }
+
+  /* Estimate table */
+  .estimate-row-header td {
+    font-weight: 600;
+    background: #f7f7fc;
+    color: #1a1a2e;
+  }
+  .estimate-value { font-weight: 600; }
+  .estimate-green { color: #059669; }
+
+  /* Footer */
+  .footer {
+    margin-top: 48px;
+    padding: 20px 56px;
+    background: #f7f7fc;
+    border-top: 1px solid #e8e8f5;
+    font-size: 11px;
+    color: #888;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Not included section */
+  .not-included {
+    background: #fafafa;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .not-included ul {
+    list-style: none;
+    columns: 2;
+    gap: 8px;
+  }
+  .not-included li {
+    font-size: 12px;
+    color: #666;
+    padding: 3px 0;
+    padding-left: 18px;
+    position: relative;
+  }
+  .not-included li::before {
+    content: '✗';
+    position: absolute;
+    left: 0;
+    color: #ccc;
+    font-size: 11px;
+  }
+
+  /* Decision cards */
+  .decision-card {
+    border-bottom: 1px solid #ebebf5;
+    padding: 20px 0;
+    page-break-inside: avoid;
+  }
+  .decision-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .decision-number {
+    width: 36px;
+    height: 36px;
+    background: #1a1a2e;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .decision-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .decision-tag { margin-top: 2px; }
+  .decision-body {
+    padding-left: 52px;
+    font-size: 12.5px;
+    color: #444;
+    line-height: 1.7;
+  }
+  .decision-body p { margin: 0; }
+  .decision-body strong { color: #1a1a2e; }
+  .decision-body em { color: #e91e8c; font-style: normal; font-weight: 600; }
+
+  @media print {
+    @page {
+      size: A4;
+      margin: 0;
+    }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { page-break-after: always; }
+    .section { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-accent"></div>
+  <div class="cover-logo">dilatih<span>.co</span></div>
+  <div class="cover-badge">Campaign Report</div>
+  <h1>Meta Ads — Certified IT Auditor BNSP</h1>
+  <p class="cover-sub">Pelatihan CITA · 16–17 September 2026 · Online via Zoom</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Platform</div>
+      <div class="cover-meta-value">Meta (Instagram)</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Budget Total</div>
+      <div class="cover-meta-value">Rp500.000</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Durasi Campaign</div>
+      <div class="cover-meta-value">4 Hari · 8–11 Sep</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Objective</div>
+      <div class="cover-meta-value">Registrasi Peserta</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Dibuat</div>
+      <div class="cover-meta-value">6 September 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- SUMMARY -->
+  <div class="section">
+    <div class="section-title">Ringkasan Eksekutif</div>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="label">Budget</div>
+        <div class="value accent">Rp500rb</div>
+        <div class="sub">Lifetime, 4 hari</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Budget / Hari</div>
+        <div class="value">Rp125rb</div>
+        <div class="sub">8–11 September</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Target Peserta</div>
+        <div class="value">3–5</div>
+        <div class="sub">Realistis konservatif</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Break-even</div>
+        <div class="value">1 peserta</div>
+        <div class="sub">Rp4,25jt vs Rp500rb</div>
+      </div>
+    </div>
+    <div class="highlight-box">
+      <p><strong>Prinsip mikro-budget:</strong> 1 campaign · 1 ad set · 1 creative. Budget tidak difragmentasi ke A/B test atau multi-layer supaya sinyal ke algoritma Meta terpusat dan cepat belajar dalam window 4 hari yang tersedia.</p>
+    </div>
+  </div>
+
+  <!-- RASIONALE DURASI -->
+  <div class="section">
+    <div class="section-title">Rasionale Durasi — Mengapa 4 Hari</div>
+    <table>
+      <thead>
+        <tr><th>Opsi</th><th>Budget/Hari</th><th>Verdict</th><th>Alasan</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>3 hari</td>
+          <td>Rp167rb</td>
+          <td><span class="tag tag-orange">Tidak optimal</span></td>
+          <td>Algoritma Meta baru belajar audience saat campaign sudah selesai</td>
+        </tr>
+        <tr>
+          <td><strong>4 hari</strong></td>
+          <td><strong>Rp125rb</strong></td>
+          <td><span class="tag tag-green">Optimal ✓</span></td>
+          <td>Cukup sinyal awal + sisakan 5 hari (12–16 Sep) untuk organic & follow-up WA manual</td>
+        </tr>
+        <tr>
+          <td>5 hari</td>
+          <td>Rp100rb</td>
+          <td><span class="tag tag-orange">Tidak optimal</span></td>
+          <td>Budget/hari terlalu tipis — Meta sulit optimize objective Messages di bawah Rp100rb/hari</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:#555;">Window 8–11 Sep (Selasa–Jumat) menargetkan jam kerja profesional IT — waktu pengambilan keputusan pendaftaran pelatihan lebih tinggi dibanding weekend.</p>
+  </div>
+
+  <!-- OBJECTIVE -->
+  <div class="section">
+    <div class="section-title">Objective — Messages (Click-to-WhatsApp)</div>
+    <table>
+      <thead>
+        <tr><th>Objective</th><th>Alasan Dipilih / Tidak Dipilih</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Messages (WA)</strong> <span class="tag tag-green">Dipilih</span></td>
+          <td>Friction paling rendah di Indonesia · feedback loop cepat · learning threshold longgar · tim bisa nurture via WA sampai H-1</td>
+        </tr>
+        <tr>
+          <td>Leads / Conversions</td>
+          <td><span class="tag tag-orange">Tidak</span> — butuh ≥50 konversi/minggu untuk exit learning. Rp500rb tidak cukup.</td>
+        </tr>
+        <tr>
+          <td>Traffic</td>
+          <td><span class="tag tag-orange">Tidak</span> — optimasi untuk klik, bukan chat/pendaftar. ROI tidak langsung terukur.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SETUP CAMPAIGN -->
+  <div class="section">
+    <div class="section-title">Setup Meta Ads Manager</div>
+
+    <table>
+      <thead><tr><th colspan="2">Campaign</th></tr></thead>
+      <tbody>
+        <tr><td style="width:200px;color:#888;">Nama</td><td><code>CITA-BNSP-Sep26-Messages</code></td></tr>
+        <tr><td style="color:#888;">Objective</td><td>Messages → Click-to-WhatsApp</td></tr>
+        <tr><td style="color:#888;">Budget</td><td><strong>Rp500.000 Lifetime Budget</strong></td></tr>
+        <tr><td style="color:#888;">Tanggal</td><td>8 September – 11 September 2026</td></tr>
+        <tr><td style="color:#888;">Bid Strategy</td><td>Highest Volume (default — jangan ubah)</td></tr>
+      </tbody>
+    </table>
+
+    <table style="margin-top:12px;">
+      <thead><tr><th colspan="2">Ad Set — <code>ProIT-Compliance-Cold-Jawa</code></th></tr></thead>
+      <tbody>
+        <tr><td style="width:200px;color:#888;">Lokasi</td><td>DKI Jakarta · Bogor · Depok · Tangerang · Bekasi · Bandung · Surabaya · Semarang · Yogyakarta</td></tr>
+        <tr><td style="color:#888;">Usia</td><td>25–40 tahun</td></tr>
+        <tr><td style="color:#888;">Bahasa</td><td>Indonesian</td></tr>
+        <tr><td style="color:#888;">Interests (pilih 4–6)</td><td>Information Technology Audit · Information Security · Internal Audit · Cybersecurity · Risk Management · ISACA</td></tr>
+        <tr><td style="color:#888;">Targeting Expansion</td><td><strong>OFF</strong></td></tr>
+        <tr><td style="color:#888;">Placement</td><td>Manual: <strong>Instagram Feed + Instagram Explore saja</strong> (matikan Facebook, Messenger, Audience Network)</td></tr>
+        <tr><td style="color:#888;">Target Audience Size</td><td>200k–800k</td></tr>
+      </tbody>
+    </table>
+
+    <table style="margin-top:12px;">
+      <thead><tr><th colspan="2">Ad — <code>CITA-BNSP-Single-Image-v1</code></th></tr></thead>
+      <tbody>
+        <tr><td style="width:200px;color:#888;">Format</td><td>Single Image</td></tr>
+        <tr><td style="color:#888;">Creative</td><td><code>IG-Feed-CITA-BNSP.png</code> (1080×1080px)</td></tr>
+        <tr><td style="color:#888;">CTA Button</td><td>Send Message → WhatsApp</td></tr>
+        <tr><td style="color:#888;">WA Destination</td><td><code>wa.me/85174369965</code></td></tr>
+        <tr><td style="color:#888;">Pre-filled Message</td><td>"Halo Dilatih, saya tertarik daftar Certified IT Auditor BNSP 16–17 Sep 2026. Boleh info lebih lanjut?"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- COPY -->
+  <div class="section">
+    <div class="section-title">Copy Final</div>
+    <div class="copy-label">Primary Text</div>
+    <div class="copy-block">Kerja di IT tapi belum punya sertifikasi yang diakui negara?
+Certified IT Auditor (CITA) BNSP · 16–17 Sep · Online.
+Rp4.250.000 · Kuota terbatas.
+Chat kami untuk info &amp; daftar 👇</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div>
+        <div class="copy-label">Headline (≤40 char)</div>
+        <div class="copy-block">Sertifikasi IT Auditor BNSP Resmi</div>
+      </div>
+      <div>
+        <div class="copy-label">Description (≤30 char)</div>
+        <div class="copy-block">16–17 Sep · Online · Rp4,25jt</div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Elemen Copy</th><th>Strategi</th></tr></thead>
+      <tbody>
+        <tr><td>Hook baris 1</td><td>Kualifikasi audiens — bukan IT? scroll pergi = hemat budget dari non-target</td></tr>
+        <tr><td>Baris 2</td><td>Nama program + tanggal + format = jawab 3 pertanyaan pertama sekaligus</td></tr>
+        <tr><td>Harga di copy</td><td>Pre-qualify budget — kurangi WA chat "berapa harganya?" dari yang tidak mampu</td></tr>
+        <tr><td>CTA</td><td>Langsung arahkan ke WA, friction minimal</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CHECKLIST PRE-LAUNCH -->
+  <div class="section">
+    <div class="section-title">Checklist Pre-Launch (Sebelum 8 Sep · 08:00)</div>
+    <div class="checklist-group">Landing Page &amp; Tracking</div>
+    <ul class="checklist">
+      <li><div class="check-box"></div><span><code>dilatih.co/registrationCITAPBNSP</code> live &amp; mobile-friendly (load &lt;3 detik)</span></li>
+      <li><div class="check-box"></div><span>Harga di LP = Rp4.250.000 (dari Rp5.000.000) — konsisten dengan desain creative</span></li>
+      <li><div class="check-box"></div><span>Meta Pixel terpasang · event <code>ViewContent</code> atau <code>Lead</code> terpicu saat form diisi</span></li>
+      <li><div class="check-box"></div><span>Verifikasi dengan Meta Pixel Helper (Chrome extension)</span></li>
+    </ul>
+    <div class="checklist-group">WhatsApp</div>
+    <ul class="checklist">
+      <li><div class="check-box"></div><span>Nomor <code>wa.me/85174369965</code> aktif · PIC tersedia selama 8–17 Sep</span></li>
+      <li><div class="check-box"></div><span>Response time target: &lt;2 jam di jam kerja</span></li>
+      <li><div class="check-box"></div><span>Template balas cepat siap: harga, silabus, cara bayar, rekaman</span></li>
+      <li><div class="check-box done">✓</div><span>Akses rekaman: <strong>tersedia</strong> (dikonfirmasi 6 Sep 2026)</span></li>
+    </ul>
+    <div class="checklist-group">Ad Account</div>
+    <ul class="checklist">
+      <li><div class="check-box"></div><span>Business Manager aktif · payment method valid · tidak ada billing issue</span></li>
+      <li><div class="check-box"></div><span>Instagram account terhubung ke Ad Account</span></li>
+      <li><div class="check-box"></div><span>Creative diupload → preview di Ads Manager (cek crop di Feed &amp; Explore)</span></li>
+      <li><div class="check-box"></div><span>UTM terpasang: <code>?utm_source=meta&utm_medium=paid&utm_campaign=cita-bnsp-sep26</code></span></li>
+    </ul>
+    <div class="checklist-group">Compliance</div>
+    <ul class="checklist">
+      <li><div class="check-box"></div><span>Text overlay &lt;20% via Meta Text Overlay Tool</span></li>
+      <li><div class="check-box"></div><span>Copy bebas dari: "garansi lulus", "#1", "terbaik", superlative tanpa sumber</span></li>
+      <li><div class="check-box"></div><span>Logo BNSP di creative valid (Dilatih lembaga sertifikasi BNSP aktif)</span></li>
+    </ul>
+  </div>
+
+  <!-- MONITORING -->
+  <div class="section">
+    <div class="section-title">Monitoring &amp; Optimization Harian</div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Hari 1 · 8 Sep · Hanya Monitor</div>
+        <div class="timeline-title">Jangan ubah apapun hari ini</div>
+        <div class="timeline-body">Cek jam 12:00 &amp; 20:00 → delivery status "Active"? Impression > 0? Jika "Rejected": cek notifikasi Ads Manager &amp; perbaiki.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Hari 2 · 9 Sep · Evaluasi Awal</div>
+        <div class="timeline-title">Sinyal pertama</div>
+        <div class="timeline-body">CPM &gt; Rp100rb → longgarkan 1 interest. CTR &lt; 0.8% → biarkan jalan (tidak ada waktu ganti creative). 0 chat WA setelah 200+ klik → audit LP &amp; CTA.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Hari 3 · 10 Sep · Keputusan</div>
+        <div class="timeline-title">Scale atau hold</div>
+        <div class="timeline-body">CPA per chat qualified &lt; Rp20rb → biarkan lanjut, jangan tambah budget (reset learning). CPA &gt; Rp50rb → biarkan habis. Jangan buang uang tambah.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Hari 4 · 11 Sep · Otomatis Selesai</div>
+        <div class="timeline-title">Tidak ada aksi</div>
+        <div class="timeline-body">Budget habis otomatis. Campaign berhenti sendiri.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:#1a1a2e;box-shadow:0 0 0 2px #1a1a2e;"></div>
+        <div class="timeline-date" style="color:#1a1a2e;">12–16 Sep · Post-Campaign</div>
+        <div class="timeline-title">Nurture manual</div>
+        <div class="timeline-body">Semua lead WA di-nurture manual sampai H-1. Posting desain yang sama sebagai organic IG feed + WA Story (gratis reach tambahan).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESTIMASI HASIL -->
+  <div class="section">
+    <div class="section-title">Estimasi Hasil</div>
+    <table>
+      <thead>
+        <tr><th>Metrik</th><th>Konservatif</th><th>Optimis</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Reach</td><td>6.000–8.000 orang</td><td>10.000–15.000 orang</td></tr>
+        <tr><td>WA Chat Initiated</td><td>40–80 chat</td><td>100–150 chat</td></tr>
+        <tr><td>Lead Qualified</td><td>15–30 lead</td><td>40–60 lead</td></tr>
+        <tr class="estimate-row-header">
+          <td><strong>Registrasi Bayar</strong></td>
+          <td class="estimate-green"><strong>2–5 peserta</strong></td>
+          <td class="estimate-green"><strong>6–10 peserta</strong></td>
+        </tr>
+        <tr><td>CPA per Peserta</td><td>Rp100–250rb</td><td>Rp50–83rb</td></tr>
+      </tbody>
+    </table>
+    <div class="highlight-box">
+      <p><strong>Break-even:</strong> 1 peserta = Rp4.250.000 revenue vs Rp500.000 ad spend. ROI 750% dari 1 peserta saja. Campaign dianggap berhasil jika dapat ≥1 peserta baru yang tidak akan daftar tanpa iklan.</p>
+    </div>
+  </div>
+
+  <!-- YANG TIDAK DILAKUKAN -->
+  <div class="section">
+    <div class="section-title">Yang Tidak Dilakukan (Sadar Dipotong — Budget Constraint)</div>
+    <div class="not-included">
+      <ul>
+        <li>Retarget layer (butuh +Rp300rb min)</li>
+        <li>A/B test copy atau creative (butuh 2× budget)</li>
+        <li>Cold + Warm layering (fragmentasi sinyal)</li>
+        <li>Google Search RSA (di luar scope)</li>
+        <li>Video / Reels (tidak ada asset ready)</li>
+        <li>Multiple creative rotation (Creative D–H)</li>
+      </ul>
+    </div>
+    <p style="font-size:12px;color:#888;margin-top:10px;">Semua taktik di atas disimpan sebagai backlog untuk kampanye batch berikutnya dengan budget yang lebih besar.</p>
+  </div>
+
+  <!-- KEPUTUSAN CAMPAIGN -->
+  <div class="section">
+    <div class="section-title">Penjelasan Keputusan Campaign</div>
+    <p style="font-size:12px;color:#555;margin-bottom:20px;">Setiap keputusan dalam campaign ini diambil berdasarkan satu constraint utama: <strong>budget Rp500.000 dengan window 10 hari sebelum event</strong>. Di bawah ini adalah penjelasan lengkap mengapa setiap pilihan dibuat — bukan karena preferensi, tapi karena logika matematika dan perilaku platform.</p>
+
+    <!-- KEPUTUSAN 1 -->
+    <div class="decision-card">
+      <div class="decision-header">
+        <div class="decision-number">01</div>
+        <div>
+          <div class="decision-title">Durasi 4 Hari — Bukan 3, Bukan 5</div>
+          <div class="decision-tag"><span class="tag tag-blue">Durasi &amp; Budget</span></div>
+        </div>
+      </div>
+      <div class="decision-body">
+        <p>Algoritma Meta membutuhkan waktu untuk mempelajari siapa di antara audience yang paling mungkin melakukan aksi (klik WA). Proses ini disebut <em>learning phase</em>. Jika campaign terlalu pendek, algoritma belum selesai belajar saat budget habis — uang terbuang untuk distribusi yang belum teroptimasi.</p>
+        <p style="margin-top:10px;"><strong>3 hari terlalu pendek:</strong> Dengan Rp167rb/hari, Meta baru mulai mendapat sinyal yang cukup di hari ke-2 atau ke-3. Saat algoritma mulai paham siapa target yang tepat, campaign sudah habis.</p>
+        <p style="margin-top:10px;"><strong>5 hari terlalu tipis per hari:</strong> Rp100rb/hari berada di bawah threshold efektif untuk objective Messages di pasar Indonesia. Campaign akan masuk status <em>Learning Limited</em> — Meta tidak mendapat cukup signal untuk optimize, dan delivery menjadi tidak efisien.</p>
+        <p style="margin-top:10px;"><strong>4 hari adalah sweet spot:</strong> Rp125rb/hari cukup untuk menggerakkan distribusi, dan 4 hari memberi cukup waktu bagi algoritma untuk belajar dan mulai deliver ke profil yang lebih relevan di hari ke-3 dan ke-4. Selain itu, campaign berakhir 11 Sep — menyisakan 5 hari penuh (12–16 Sep) untuk nurture WA manual dan posting organik tanpa biaya tambahan.</p>
+      </div>
+    </div>
+
+    <!-- KEPUTUSAN 2 -->
+    <div class="decision-card">
+      <div class="decision-header">
+        <div class="decision-number">02</div>
+        <div>
+          <div class="decision-title">Objective Messages (Click-to-WA) — Bukan Leads atau Conversions</div>
+          <div class="decision-tag"><span class="tag tag-blue">Objective</span></div>
+        </div>
+      </div>
+      <div class="decision-body">
+        <p>Meta menawarkan berbagai objective. Pilihan objective menentukan siapa yang akan melihat iklan (Meta mengoptimasi distribusi berdasarkan siapa yang paling mungkin melakukan aksi yang dioptimasi).</p>
+        <p style="margin-top:10px;"><strong>Mengapa bukan Leads atau Conversions?</strong> Kedua objective ini membutuhkan minimal <strong>50 konversi per minggu</strong> agar algoritma bisa keluar dari learning phase dan mulai optimize secara efektif. Dengan total Rp500rb dan durasi 4 hari, hampir mustahil mencapai 50 event dalam satu minggu — campaign akan terus berada di learning phase dan tidak pernah reach optimal performance.</p>
+        <p style="margin-top:10px;"><strong>Mengapa bukan Traffic?</strong> Traffic mengoptimasi untuk klik ke URL — bukan untuk orang yang benar-benar tertarik mendaftar. Hasilnya banyak klik tidak berkualitas: orang yang iseng klik tapi tidak punya niat daftar. Biaya per klik bisa murah, tapi konversi ke peserta sangat rendah.</p>
+        <p style="margin-top:10px;"><strong>Mengapa Messages?</strong> Ada tiga alasan utama. Pertama, <em>learning threshold lebih longgar</em> — Meta bisa optimize objective Messages dengan data yang lebih sedikit dibanding Conversions, cocok untuk budget mikro. Kedua, <em>WA adalah default komunikasi bisnis Indonesia</em> — friction dari "lihat iklan" ke "chat WA" jauh lebih rendah dibanding mengisi form. Ketiga, <em>manusia di ujung WA bisa closing langsung</em> — satu chat qualified yang direspon dengan baik bisa jadi peserta dalam 30 menit, tanpa menunggu funnel email atau retarget.</p>
+      </div>
+    </div>
+
+    <!-- KEPUTUSAN 3 -->
+    <div class="decision-card">
+      <div class="decision-header">
+        <div class="decision-number">03</div>
+        <div>
+          <div class="decision-title">Satu Campaign · Satu Ad Set · Satu Creative</div>
+          <div class="decision-tag"><span class="tag tag-blue">Struktur</span></div>
+        </div>
+      </div>
+      <div class="decision-body">
+        <p>Intuisi awal sering mendorong untuk membuat banyak variasi — dua ad set untuk dua segmen audience, dua creative untuk A/B test, satu campaign cold dan satu retarget. Pada budget besar (>Rp5 juta/bulan), strategi ini masuk akal. Pada budget Rp500rb, strategi itu kontraproduktif.</p>
+        <p style="margin-top:10px;"><strong>Masalah fragmentasi budget:</strong> Jika Rp500rb dibagi ke dua ad set, masing-masing hanya mendapat Rp250rb selama 4 hari — Rp62.500/hari per ad set. Di angka itu, Meta hampir tidak bisa optimize sama sekali. Kedua ad set akan stuck di learning phase dan tidak ada yang perform baik.</p>
+        <p style="margin-top:10px;"><strong>Logika konsentrasi sinyal:</strong> Semakin banyak sinyal (klik, chat, engagement) yang masuk ke satu ad set, semakin cepat dan akurat algoritma bisa belajar siapa yang harus ditarget. Dengan mengkonsentrasikan semua Rp500rb ke satu ad set, kita memberi Meta sinyal terpusat yang lebih kuat — hasilnya lebih baik dari dua ad set yang masing-masing setengah sinyal.</p>
+        <p style="margin-top:10px;"><strong>Satu creative:</strong> A/B test membutuhkan budget 2× untuk mendapat hasil yang statistis signifikan. Dengan satu creative, seluruh budget dipakai untuk distribusi, bukan dibagi antara testing dan distribusi.</p>
+      </div>
+    </div>
+
+    <!-- KEPUTUSAN 4 -->
+    <div class="decision-card">
+      <div class="decision-header">
+        <div class="decision-number">04</div>
+        <div>
+          <div class="decision-title">Placement Manual: Instagram Feed + Explore Saja</div>
+          <div class="decision-tag"><span class="tag tag-blue">Placement</span></div>
+        </div>
+      </div>
+      <div class="decision-body">
+        <p>Meta secara default menawarkan <em>Advantage+ Placements</em> — iklan didistribusikan ke semua placement yang tersedia: Instagram Feed, Reels, Stories, Facebook Feed, Facebook Reels, Messenger, Audience Network (aplikasi pihak ketiga), dll. Pada budget besar dengan creative yang didesain untuk semua format, ini bisa efisien.</p>
+        <p style="margin-top:10px;"><strong>Masalahnya:</strong> Creative yang kita punya adalah gambar 1:1 (1080×1080px) yang didesain spesifik untuk Instagram Feed. Jika dijalankan di Stories atau Reels (format 9:16), gambar akan di-crop atau diperbesar secara otomatis — hasilnya terlihat buruk dan tidak profesional. Di Audience Network (aplikasi mobile lain), iklan sering muncul di konteks yang tidak relevan dengan konten IT Audit — click-through rate rendah, buang budget.</p>
+        <p style="margin-top:10px;"><strong>Instagram Explore dipilih karena:</strong> Format 1:1 tetap berfungsi baik di Explore. Lebih penting lagi, pengguna di tab Explore secara aktif mencari konten baru — intent lebih tinggi dibanding Feed pasif. Profesional IT yang scrolling Explore lebih mungkin berhenti pada iklan yang relevan dengan profesi mereka.</p>
+        <p style="margin-top:10px;"><strong>Facebook Feed dimatikan:</strong> Demografis aktif di Facebook Indonesia cenderung lebih tua dan kurang relevan untuk segmen IT Auditor profesional 25–40 tahun yang lebih banyak aktif di Instagram. Budget yang tersedia terlalu kecil untuk cover dua platform sekaligus dengan efektif.</p>
+      </div>
+    </div>
+
+    <!-- KEPUTUSAN 5 -->
+    <div class="decision-card">
+      <div class="decision-header">
+        <div class="decision-number">05</div>
+        <div>
+          <div class="decision-title">Interest Targeting Narrow — Bukan Broad atau Lookalike</div>
+          <div class="decision-tag"><span class="tag tag-blue">Audience</span></div>
+        </div>
+      </div>
+      <div class="decision-body">
+        <p>Ada tiga pendekatan utama targeting di Meta: interest-based (narrow), broad (tanpa targeting khusus, biarkan Meta yang tentukan), dan lookalike (berdasarkan database pelanggan yang sudah ada).</p>
+        <p style="margin-top:10px;"><strong>Mengapa bukan broad?</strong> Broad audience bekerja paling baik dengan objective Conversions yang sudah memiliki data historis banyak — Meta punya referensi "profil pelanggan" dari pixel data. Tanpa data historis yang cukup, broad targeting pada budget Rp500rb akan menjangkau audience yang terlalu acak: ibu rumah tangga, pelajar SMA, hingga orang yang sama sekali tidak berkaitan dengan IT.</p>
+        <p style="margin-top:10px;"><strong>Mengapa bukan lookalike?</strong> Lookalike membutuhkan source audience minimal 100–1.000 orang dari pixel data atau customer list. Jika Dilatih belum memiliki customer list yang cukup besar dan bersih, kualitas lookalike akan rendah dan tidak lebih baik dari broad.</p>
+        <p style="margin-top:10px;"><strong>Mengapa interest narrow?</strong> Dengan memilih interest yang sangat spesifik (IT Audit, Information Security, ISACA, Internal Audit), kita memastikan hanya profesional yang sudah memiliki konteks dan ketertarikan di bidang ini yang melihat iklan. CPM-nya mungkin sedikit lebih tinggi, tapi conversion rate dari impression ke chat jauh lebih baik — setiap rupiah budget dihabiskan untuk orang yang relevan.</p>
+        <p style="margin-top:10px;"><strong>Target 200k–800k orang:</strong> Ini adalah range ideal. Di bawah 100k terlalu narrow — Meta kesulitan mendistribusikan budget dan CPM melonjak. Di atas 1 juta terlalu lebar — audience mulai tidak relevan. Range 200k–800k memberi Meta cukup ruang untuk optimize tanpa kehilangan relevansi.</p>
+      </div>
+    </div>
+
+    <!-- KEPUTUSAN 6 -->
+    <div class="decision-card">
+      <div class="decision-header">
+        <div class="decision-number">06</div>
+        <div>
+          <div class="decision-title">Struktur Copy: Hook Kualifikasi + Harga di Body</div>
+          <div class="decision-tag"><span class="tag tag-blue">Copy &amp; Creative</span></div>
+        </div>
+      </div>
+      <div class="decision-body">
+        <p>Copy iklan dirancang untuk dua tujuan sekaligus: <em>menarik yang tepat</em> dan <em>menolak yang tidak tepat</em>. Pada budget mikro, menghemat satu klik non-target sama berharganya dengan mendapat satu klik target.</p>
+        <p style="margin-top:10px;"><strong>"Kerja di IT tapi belum punya sertifikasi yang diakui negara?"</strong> — Baris pertama bukan sekadar hook. Ini adalah <em>qualification filter</em>. Seseorang yang tidak bekerja di IT secara otomatis merasa baris ini bukan untuk mereka dan scroll lanjut. Yang berhenti adalah mereka yang relevan: IT professional yang belum punya BNSP. Ini menghemat budget dari klik non-target.</p>
+        <p style="margin-top:10px;"><strong>Nama program + tanggal + format di baris kedua:</strong> Tiga pertanyaan pertama yang selalu ditanyakan calon peserta adalah "program apa ini?", "kapan?", dan "online atau offline?". Menjawab ketiganya di baris kedua berarti orang yang tertarik langsung punya cukup informasi untuk memutuskan apakah mau klik atau tidak — mengurangi klik ragu-ragu yang tidak jadi daftar.</p>
+        <p style="margin-top:10px;"><strong>Harga ditampilkan di copy:</strong> Menampilkan harga Rp4.250.000 di copy iklan adalah keputusan yang sering dihindari karena takut mengusir calon pembeli. Tapi untuk budget mikro, ini justru strategi yang tepat. Seseorang yang membuka WA hanya untuk bertanya harga lalu mengatakan "mahal" adalah lead yang tidak berkualitas — mereka menghabiskan waktu PIC WA dan tidak pernah akan jadi peserta. Dengan harga di copy, hanya mereka yang sudah "setuju" dengan harga yang akan chat — kualitas lead WA jauh lebih tinggi.</p>
+      </div>
+    </div>
+
+    <!-- KEPUTUSAN 7 -->
+    <div class="decision-card">
+      <div class="decision-header">
+        <div class="decision-number">07</div>
+        <div>
+          <div class="decision-title">Tidak Ada Retarget Layer</div>
+          <div class="decision-tag"><span class="tag tag-blue">Funnel &amp; Struktur</span></div>
+        </div>
+      </div>
+      <div class="decision-body">
+        <p>Retargeting — menampilkan iklan kedua kepada orang yang sudah mengunjungi landing page tapi belum mendaftar — adalah salah satu taktik paling efektif dalam paid ads. ROI-nya biasanya 3–5× lebih tinggi dari cold campaign karena menyasar orang yang sudah menunjukkan intent.</p>
+        <p style="margin-top:10px;"><strong>Mengapa tidak dilakukan di sini?</strong> Retarget membutuhkan minimal dua budget pool: satu untuk cold (membangun audience retarget) dan satu untuk retarget itu sendiri. Jika Rp500rb dibagi menjadi cold Rp350rb dan retarget Rp150rb, tidak ada yang cukup untuk perform. Cold audience tidak terbangun cukup besar untuk diretarget, dan Rp150rb retarget tidak cukup untuk mendapat signal yang bermakna.</p>
+        <p style="margin-top:10px;"><strong>Sebagai gantinya:</strong> Retarget dilakukan secara <em>manual dan gratis</em> melalui follow-up WA. Setiap orang yang pernah chat tapi belum bayar akan di-nurture oleh PIC WA dengan pesan manual di H-3, H-1, dan H-0 sebelum event. Ini lebih personalized dari retarget iklan dan tidak menghabiskan budget.</p>
+      </div>
+    </div>
+
+    <!-- KEPUTUSAN 8 -->
+    <div class="decision-card">
+      <div class="decision-header">
+        <div class="decision-number">08</div>
+        <div>
+          <div class="decision-title">Lokasi Hanya Kota Besar Jawa — Bukan Seluruh Indonesia</div>
+          <div class="decision-tag"><span class="tag tag-blue">Targeting Geografis</span></div>
+        </div>
+      </div>
+      <div class="decision-body">
+        <p>Program CITA BNSP dijalankan online — secara teknis bisa diakses dari seluruh Indonesia. Namun menarget seluruh Indonesia dengan Rp500rb adalah kesalahan yang sering dilakukan kampanye mikro-budget.</p>
+        <p style="margin-top:10px;"><strong>Mengapa terbatas di kota besar Jawa?</strong> Pertama, konsentrasi profesional IT tertinggi di Indonesia ada di Jakarta, Bandung, Surabaya, Semarang, dan Yogyakarta. Menarget kota-kota ini berarti CPM yang dikeluarkan untuk setiap 1.000 tayangan menghasilkan proporsi profesional IT yang lebih tinggi.</p>
+        <p style="margin-top:10px;">Kedua, dengan budget Rp500rb untuk seluruh Indonesia, reach per kota akan sangat tipis — tidak cukup untuk membangun frekuensi (berapa kali rata-rata satu orang melihat iklan). Frekuensi yang terlalu rendah artinya banyak orang hanya melihat iklan sekali dan lupa. Dengan membatasi ke kota-kota utama Jawa, frekuensi per orang lebih tinggi dalam budget yang sama.</p>
+        <p style="margin-top:10px;">Ketiga, konsentrasi geografis memudahkan tim WA untuk memahami konteks lead yang masuk — jam kerja sama, referensi budaya bisnis serupa, memudahkan proses nurture dan closing.</p>
+      </div>
+    </div>
+
+    <!-- KEPUTUSAN 9 -->
+    <div class="decision-card" style="border-bottom:none;margin-bottom:0;">
+      <div class="decision-header">
+        <div class="decision-number">09</div>
+        <div>
+          <div class="decision-title">Tidak Mengubah Campaign Saat Berjalan (Hari 1 &amp; 2)</div>
+          <div class="decision-tag"><span class="tag tag-blue">Optimization</span></div>
+        </div>
+      </div>
+      <div class="decision-body">
+        <p>Godaan terbesar saat menjalankan iklan adalah mengubah sesuatu ketika hasil di hari pertama terlihat tidak memuaskan. CPM tinggi, CTR rendah, belum ada chat — terasa seperti ada yang salah dan harus diperbaiki segera.</p>
+        <p style="margin-top:10px;"><strong>Mengapa tidak boleh diubah di hari 1–2?</strong> Setiap perubahan signifikan pada ad set (budget, audience, placement, creative) me-reset learning phase Meta. Artinya seluruh sinyal yang sudah dikumpulkan dibuang dan algoritma mulai dari nol lagi. Pada campaign 4 hari, reset di hari ke-2 artinya campaign tidak pernah keluar dari learning phase — hasilnya selalu suboptimal.</p>
+        <p style="margin-top:10px;"><strong>Yang boleh dilakukan di hari 1:</strong> Hanya memantau apakah campaign <em>delivering</em> (status "Active", ada impression). Jika status "Rejected" atau "Not Delivering", itu memang harus ditangani segera.</p>
+        <p style="margin-top:10px;"><strong>Yang boleh dilakukan di hari 2–3:</strong> Hanya penyesuaian ringan yang tidak me-reset learning — seperti melonggarkan satu interest jika audience terlalu narrow (yang menyebabkan CPM sangat tinggi). Jangan pernah mengubah budget lebih dari 20% sekaligus, jangan ganti creative, jangan ubah objective.</p>
+        <p style="margin-top:10px;">Kesabaran di hari 1–2 adalah investasi untuk performa yang lebih baik di hari 3–4.</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>dilatih.co · Campaign Report · CITA BNSP Sep 2026</span>
+  <span>Dibuat 6 September 2026 · Status: Approved</span>
+</div>
+
+</body>
+</html>

@@ -3,7 +3,16 @@
     "allow": [
       "WebFetch(domain:dilatih.co)",
       "Bash(gh repo *)",
-      "WebFetch(domain:www.chatwoot.com)"
+      "WebFetch(domain:www.chatwoot.com)",
+      "Bash(python *)",
+      "mcp__claude_ai_Canva__generate-design",
+      "WebSearch",
+      "WebFetch(domain:www.canva.com)",
+      "WebFetch(domain:www.pinterest.com)",
+      "WebFetch(domain:dribbble.com)",
+      "WebFetch(domain:id.pinterest.com)",
+      "WebFetch(domain:www.behance.net)",
+      "WebFetch(domain:mir-s3-cdn-cf.behance.net)"
     ]
   }
 }

@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "marketing/materials/chatbot-chatwoot-n8n/mvp-leads-intent.md",
+                "file": "marketing/materials/campaign-plan-meta-cita-bnsp-sep2026.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "mvp-leads-intent"
+              "title": "campaign-plan-meta-cita-bnsp-sep2026"
             }
           }
         ],
@@ -202,21 +202,32 @@
   },
   "active": "0786daaf02a3f890",
   "lastOpenFiles": [
+    "marketing/materials/paid-ads-creative-brief-v1.md",
+    "marketing/materials/brief-visual-ads-itaudit-bnsp-extension-D-E-F-G-H.md",
+    "marketing/materials/brief-visual-ads-itaudit-bnsp-sep2026.md",
+    "export/campaign-report-cita-bnsp-sep2026-v2.pdf",
+    "export/campaign-report-cita-bnsp-sep2026.pdf",
+    "toP9088.pdf",
+    "toP9087.html",
+    "export/campaign-report-cita-bnsp-sep2026.html",
+    "marketing/materials/campaign-plan-meta-cita-bnsp-sep2026.md",
+    "export/IG-Story-CITA-BNSP.png",
+    "export/IG-Feed-CITA-BNSP.png",
+    "export",
+    "unit kompetensi IT Auditor.pdf",
+    "Website CITAP 8.png",
+    "marketing/materials/usulan-visual-carousel-sertifikasi-ai-fresh-graduate.md",
+    "marketing/materials/usulan-visual-story-sertifikasi-ai-fresh-graduate.md",
+    "marketing/blog/teknologi-e-ktp.md",
+    "marketing/brand-dna.md",
+    "marketing/blog/teknologi-gps.md",
+    "marketing/materials/chatbot-chatwoot-n8n/mvp-leads-intent.md",
     "marketing/materials/chatbot-chatwoot-n8n/n8n/wf1-mini-inbound.json",
     "marketing/materials/chatbot-chatwoot-n8n/n8n/wf1-mini-inbound.json.tmp.11776.74a96cbbc58d",
     "marketing/materials/chatbot-chatwoot-n8n/keputusan-dan-arsitektur.md",
     "marketing/materials/chatbot-chatwoot-n8n/spesifikasi-workflow-n8n.md",
     "marketing/materials/chatbot-chatwoot-n8n/n8n/wf2-mini-lead-capture.json",
-    "marketing/materials/chatbot-chatwoot-n8n/n8n/wf2-mini-lead-capture.json.tmp.11776.b662d9f551d2",
-    "marketing/materials/chatbot-chatwoot-n8n/n8n",
-    "marketing/materials/chatbot-chatwoot-n8n/mvp-leads-intent.md",
-    "marketing/materials/chatbot-chatwoot-n8n/mvp-leads-intent.md.tmp.11776.6824ca9d5fe2",
     "marketing/materials/chatbot-chatwoot-n8n/panduan-implementasi.md",
-    "marketing/materials/chatbot-chatwoot-n8n/keputusan-dan-arsitektur.md.tmp.11776.e5226f113114",
-    "marketing/materials/chatbot-chatwoot-n8n/panduan-implementasi.md.tmp.11776.d8edddbedf42",
-    "marketing/materials/chatbot-chatwoot-n8n/spesifikasi-workflow-n8n.md.tmp.11776.89164057f52d",
-    "marketing/materials/chatbot-chatwoot-n8n/spesifikasi-workflow-n8n.md.tmp.11776.db263a33e7da",
-    "marketing/materials/chatbot-chatwoot-n8n/labelling-dan-prioritas.md.tmp.11776.c1f1dceab8be",
     "marketing/materials/chatbot-chatwoot-n8n/system-prompt-bot.md",
     "marketing/materials/chatbot-chatwoot-n8n/labelling-dan-prioritas.md",
     "marketing/materials/chatbot-chatwoot-n8n/knowledge-base-template.md",
@@ -227,10 +238,7 @@
     "Script content/post-qris-linkedin.md",
     "marketing/materials/carousel-sertifikasi-ai-professional.md",
     "marketing/materials/usulan-visual-carousel-sertifikasi-ai-fresh-graduate-kompetisi-kerja.md",
-    "marketing/materials/usulan-visual-story-sertifikasi-ai-fresh-graduate.md",
-    "marketing/materials/usulan-visual-carousel-sertifikasi-ai-fresh-graduate.md",
     "marketing/brand-voice.md",
-    "marketing/plan.md",
-    "CLAUDE.md"
+    "marketing/plan.md"
   ]
 }
