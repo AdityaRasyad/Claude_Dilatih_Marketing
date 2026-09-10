@@ -8,9 +8,9 @@
       "typeVersion": 1,
       "position": [-20, -260],
       "parameters": {
-        "content": "## Sebelum dipakai\n1. Import `wf2-mini-lead-capture.json` LEBIH DULU, aktifkan workflow-nya.\n2. Isi node **Config** (chatwootBaseUrl, accountId, sheetId).\n3. Di setiap node **Panggil WF-2-mini**, buka dropdown workflow dan pilih ulang WF-2-mini (ID lama tidak akan cocok di instance ini).\n4. Aktifkan webhook di Chatwoot: Settings → Integrations → Webhook, event `message_created`, arahkan ke URL produksi node **Webhook Chatwoot** di bawah.\n5. **Path payload webhook (`$json.body....`) adalah asumsi berdasarkan dokumentasi internal — cek payload asli lewat satu kali tes kirim pesan, sesuaikan path di node Filter/Code kalau berbeda.**\n6. Semua label yang dipasang lewat WF-2-mini harus sudah dibuat manual di Chatwoot Settings → Labels.",
-        "height": 300,
-        "width": 460
+        "content": "## Sebelum dipakai\n1. Import `wf2-mini-lead-capture.json` LEBIH DULU, aktifkan workflow-nya.\n2. Isi node **Config** (chatwootBaseUrl, accountId, sheetId).\n3. Di setiap node **Panggil WF-2-mini**, buka dropdown workflow dan pilih ulang WF-2-mini (ID lama tidak akan cocok di instance ini).\n4. Aktifkan webhook di Chatwoot: Settings → Integrations → Webhook, event `message_created`, arahkan ke URL produksi node **Webhook Chatwoot** di bawah.\n5. Path payload sudah diverifikasi dari payload nyata Chatwoot (6 Sep 2026). Field utama: `body.content`, `body.id`, `body.sender.id/name/phone_number`, `body.conversation.id/labels`, `body.conversation.messages[0].sender.type`, `body.conversation.messages[0].conversation.assignee_id`.\n6. Semua label yang dipasang lewat WF-2-mini harus sudah dibuat manual di Chatwoot Settings → Labels.",
+        "height": 320,
+        "width": 500
       }
     },
     {
@@ -55,13 +55,34 @@
           "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
           "combinator": "and",
           "conditions": [
-            { "id": "c1", "leftValue": "={{ $json.body.message_type }}", "rightValue": "incoming", "operator": { "type": "string", "operation": "equals" } },
-            { "id": "c2", "leftValue": "={{ $json.body.sender && $json.body.sender.type }}", "rightValue": "contact", "operator": { "type": "string", "operation": "equals" } },
-            { "id": "c3", "leftValue": "={{ ($json.body.conversation.labels || []).includes('bot-off') || ($json.body.conversation.labels || []).includes('human-takeover') }}", "rightValue": "true", "operator": { "type": "string", "operation": "notEquals" } },
-            { "id": "c4", "leftValue": "={{ $json.body.conversation.assignee_id }}", "rightValue": "", "operator": { "type": "string", "operation": "equals" } }
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.body.message_type }}",
+              "rightValue": "incoming",
+              "operator": { "type": "string", "operation": "equals" }
+            },
+            {
+              "id": "c2",
+              "leftValue": "={{ $json.body.conversation.messages[0].sender.type }}",
+              "rightValue": "contact",
+              "operator": { "type": "string", "operation": "equals" }
+            },
+            {
+              "id": "c3",
+              "leftValue": "={{ ($json.body.conversation.labels || []).includes('bot-off') || ($json.body.conversation.labels || []).includes('human-takeover') }}",
+              "rightValue": "true",
+              "operator": { "type": "string", "operation": "notEquals" }
+            },
+            {
+              "id": "c4",
+              "leftValue": "={{ $json.body.conversation.messages[0].conversation.assignee_id }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "equals" }
+            }
           ]
         }
-      }
+      },
+      "notes": "c2: sender.type ada di messages[0].sender.type (bukan root body.sender). c4: assignee_id ada di messages[0].conversation.assignee_id."
     },
     {
       "id": "stop-invalid",
@@ -80,9 +101,9 @@
       "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
-        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.processedIds) staticData.processedIds = [];\n\nconst out = [];\nfor (const item of items) {\n  const msgId = item.json.body.message && item.json.body.message.id;\n  if (msgId && staticData.processedIds.includes(msgId)) continue; // sudah diproses, skip\n  if (msgId) staticData.processedIds.push(msgId);\n  if (staticData.processedIds.length > 500) staticData.processedIds = staticData.processedIds.slice(-500);\n  out.push(item);\n}\nreturn out;"
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.processedIds) staticData.processedIds = [];\n\nconst out = [];\nfor (const item of items) {\n  // message ID ada di body.id (bukan body.message.id)\n  const msgId = item.json.body.id;\n  if (msgId && staticData.processedIds.includes(String(msgId))) continue;\n  if (msgId) staticData.processedIds.push(String(msgId));\n  if (staticData.processedIds.length > 500) staticData.processedIds = staticData.processedIds.slice(-500);\n  out.push(item);\n}\nreturn out;"
       },
-      "notes": "Kalau item ini duplikat, node ini tidak meneruskan apa pun — cabang berhenti secara alami, tidak perlu node stop terpisah."
+      "notes": "Message ID ada di body.id (integer), bukan body.message.id. Dikonversi ke string untuk perbandingan konsisten."
     },
     {
       "id": "get-contact",
@@ -92,12 +113,13 @@
       "position": [860, 60],
       "parameters": {
         "method": "GET",
-        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/contacts/{{ $json.body.contact.id }}",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/contacts/{{ $json.body.sender.id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {}
       },
-      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } }
+      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } },
+      "notes": "Contact ID ada di body.sender.id (bukan body.contact.id — tidak ada field contact di root payload)."
     },
     {
       "id": "route",
@@ -114,7 +136,12 @@
                 "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
                 "combinator": "and",
                 "conditions": [
-                  { "id": "r1", "leftValue": "={{ $json.custom_attributes && $json.custom_attributes.bot_state }}", "rightValue": "", "operator": { "type": "string", "operation": "equals" } }
+                  {
+                    "id": "r1",
+                    "leftValue": "={{ $json.custom_attributes && $json.custom_attributes.bot_state }}",
+                    "rightValue": "",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
                 ]
               }
             },
@@ -124,7 +151,12 @@
                 "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
                 "combinator": "and",
                 "conditions": [
-                  { "id": "r2", "leftValue": "={{ $json.custom_attributes && $json.custom_attributes.bot_state }}", "rightValue": "menunggu_pilihan", "operator": { "type": "string", "operation": "equals" } }
+                  {
+                    "id": "r2",
+                    "leftValue": "={{ $json.custom_attributes && $json.custom_attributes.bot_state }}",
+                    "rightValue": "menunggu_pilihan",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
                 ]
               }
             },
@@ -134,7 +166,12 @@
                 "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
                 "combinator": "and",
                 "conditions": [
-                  { "id": "r3", "leftValue": "={{ true }}", "rightValue": "true", "operator": { "type": "string", "operation": "equals" } }
+                  {
+                    "id": "r3",
+                    "leftValue": "={{ true }}",
+                    "rightValue": "true",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
                 ]
               }
             }
@@ -142,7 +179,7 @@
         },
         "options": { "fallbackOutput": "bebas" }
       },
-      "notes": "3 output: baru (kirim menu) / menu (user baru pilih 1-4) / bebas (teks bebas, langsung handoff — tidak ada AI di MVP)."
+      "notes": "Input dari GET contact — cek custom_attributes.bot_state di response Chatwoot. Kosong/null = percakapan baru."
     },
     {
       "id": "kirim-menu",
@@ -161,7 +198,7 @@
         "options": {}
       },
       "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } },
-      "notes": "Teks final ambil dari copy-percakapan.md §1, ini cuma placeholder."
+      "notes": "Teks final ambil dari copy-percakapan.md §1, ini placeholder."
     },
     {
       "id": "set-menunggu",
@@ -171,7 +208,7 @@
       "position": [1520, -140],
       "parameters": {
         "method": "PATCH",
-        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/contacts/{{ $('Webhook Chatwoot').item.json.body.contact.id }}",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/contacts/{{ $('Webhook Chatwoot').item.json.body.sender.id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -179,7 +216,8 @@
         "jsonBody": "={{ JSON.stringify({ custom_attributes: { bot_state: 'menunggu_pilihan' } }) }}",
         "options": {}
       },
-      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } }
+      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } },
+      "notes": "Contact ID dari body.sender.id (bukan body.contact.id)."
     },
     {
       "id": "route-pilihan",
@@ -190,15 +228,43 @@
       "parameters": {
         "rules": {
           "values": [
-            { "outputKey": "1-bnsp", "conditions": { "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" }, "combinator": "and", "conditions": [{ "id": "p1", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.message.content.trim() }}", "rightValue": "1", "operator": { "type": "string", "operation": "equals" } }] } },
-            { "outputKey": "2-workshop", "conditions": { "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" }, "combinator": "and", "conditions": [{ "id": "p2", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.message.content.trim() }}", "rightValue": "2", "operator": { "type": "string", "operation": "equals" } }] } },
-            { "outputKey": "3-b2b", "conditions": { "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" }, "combinator": "and", "conditions": [{ "id": "p3", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.message.content.trim() }}", "rightValue": "3", "operator": { "type": "string", "operation": "equals" } }] } },
-            { "outputKey": "4-technical", "conditions": { "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" }, "combinator": "and", "conditions": [{ "id": "p4", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.message.content.trim() }}", "rightValue": "4", "operator": { "type": "string", "operation": "equals" } }] } }
+            {
+              "outputKey": "1-bnsp",
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+                "combinator": "and",
+                "conditions": [{ "id": "p1", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.content.trim() }}", "rightValue": "1", "operator": { "type": "string", "operation": "equals" } }]
+              }
+            },
+            {
+              "outputKey": "2-workshop",
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+                "combinator": "and",
+                "conditions": [{ "id": "p2", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.content.trim() }}", "rightValue": "2", "operator": { "type": "string", "operation": "equals" } }]
+              }
+            },
+            {
+              "outputKey": "3-b2b",
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+                "combinator": "and",
+                "conditions": [{ "id": "p3", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.content.trim() }}", "rightValue": "3", "operator": { "type": "string", "operation": "equals" } }]
+              }
+            },
+            {
+              "outputKey": "4-technical",
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+                "combinator": "and",
+                "conditions": [{ "id": "p4", "leftValue": "={{ $('Webhook Chatwoot').item.json.body.content.trim() }}", "rightValue": "4", "operator": { "type": "string", "operation": "equals" } }]
+              }
+            }
           ]
         },
         "options": { "fallbackOutput": "extra" }
       },
-      "notes": "Output 'extra' (angka tidak dikenali) tidak disambungkan — pesan diabaikan sampai user membalas 1-4. Bisa disambungkan ke Kirim Menu lagi kalau mau re-prompt."
+      "notes": "Isi pesan ada di body.content (bukan body.message.content). Output 'extra' tidak disambungkan — user perlu balas 1-4."
     },
     {
       "id": "set-jalur-bnsp",
@@ -235,7 +301,7 @@
         "filtersUI": { "values": [{ "lookupColumn": "jalur", "lookupValue": "={{ $json.jalur }}" }] },
         "options": {}
       },
-      "notes": "Baca tab program (dan faq bila perlu) sesuai jalur — sesuaikan mapping kolom setelah import."
+      "notes": "Sesuaikan mapping kolom lewat dropdown n8n setelah import."
     },
     {
       "id": "susun-jawaban",
@@ -246,7 +312,7 @@
       "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
-        "jsCode": "// Susun teks jawaban dari baris program/faq yang terbaca.\n// Placeholder — ganti sesuai template resmi di copy-percakapan.md §2-3.\nconst jalur = items[0]?.json?.jalur || 'bnsp';\nconst daftarProgram = items.map(i => `- ${i.json.nama || i.json.ringkasan || '(tanpa nama)'}`).join('\\n');\nconst jawaban = daftarProgram\n  ? `Berikut program ${jalur} yang tersedia:\\n${daftarProgram}\\n\\nAda yang mau ditanyakan lebih lanjut?`\n  : `Untuk saat ini kami belum punya info lengkap soal ${jalur}, tim kami akan bantu langsung ya.`;\nreturn [{ json: { jalur, jawaban } }];"
+        "jsCode": "// Susun teks jawaban dari baris program/faq yang terbaca.\n// Ganti sesuai template resmi di copy-percakapan.md §2-3.\nconst jalur = items[0]?.json?.jalur || 'bnsp';\nconst daftarProgram = items.map(i => `- ${i.json.nama || i.json.ringkasan || '(tanpa nama)'}`).join('\\n');\nconst jawaban = daftarProgram\n  ? `Berikut program ${jalur} yang tersedia:\\n${daftarProgram}\\n\\nAda yang mau ditanyakan lebih lanjut?`\n  : `Untuk saat ini kami belum punya info lengkap soal ${jalur}, tim kami akan bantu langsung ya.`;\nreturn [{ json: { jalur, jawaban } }];"
       }
     },
     {
@@ -275,7 +341,7 @@
       "position": [2400, 20],
       "parameters": {
         "method": "PATCH",
-        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/contacts/{{ $('Webhook Chatwoot').item.json.body.contact.id }}",
+        "url": "={{ $('Config').item.json.chatwootBaseUrl }}/api/v1/accounts/{{ $('Config').item.json.accountId }}/contacts/{{ $('Webhook Chatwoot').item.json.body.sender.id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -283,7 +349,8 @@
         "jsonBody": "={{ JSON.stringify({ custom_attributes: { bot_state: 'bebas' } }) }}",
         "options": {}
       },
-      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } }
+      "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } },
+      "notes": "Contact ID dari body.sender.id (bukan body.contact.id)."
     },
     {
       "id": "wf2-bnsp",
@@ -298,9 +365,9 @@
           "mappingMode": "defineBelow",
           "value": {
             "conversationId": "={{ $('Webhook Chatwoot').item.json.body.conversation.id }}",
-            "contactId": "={{ $('Webhook Chatwoot').item.json.body.contact.id }}",
-            "nama": "={{ $('Webhook Chatwoot').item.json.body.contact.name }}",
-            "kontak": "={{ $('Webhook Chatwoot').item.json.body.contact.phone_number || $('Webhook Chatwoot').item.json.body.contact.email }}",
+            "contactId": "={{ $('Webhook Chatwoot').item.json.body.sender.id }}",
+            "nama": "={{ $('Webhook Chatwoot').item.json.body.sender.name }}",
+            "kontak": "={{ $('Webhook Chatwoot').item.json.body.sender.phone_number }}",
             "intent": "={{ $('Susun Jawaban').item.json.jalur }}",
             "tipe": "individu",
             "status": "bot-handled",
@@ -308,7 +375,7 @@
           }
         }
       },
-      "notes": "Pilih ulang workflow WF-2-mini dari dropdown setelah kedua workflow diimport."
+      "notes": "nama & kontak dari body.sender (bukan body.contact). Pilih ulang WF-2 dari dropdown setelah import."
     },
     {
       "id": "kirim-tanya-b2b",
@@ -341,9 +408,9 @@
           "mappingMode": "defineBelow",
           "value": {
             "conversationId": "={{ $('Webhook Chatwoot').item.json.body.conversation.id }}",
-            "contactId": "={{ $('Webhook Chatwoot').item.json.body.contact.id }}",
-            "nama": "={{ $('Webhook Chatwoot').item.json.body.contact.name }}",
-            "kontak": "={{ $('Webhook Chatwoot').item.json.body.contact.phone_number || $('Webhook Chatwoot').item.json.body.contact.email }}",
+            "contactId": "={{ $('Webhook Chatwoot').item.json.body.sender.id }}",
+            "nama": "={{ $('Webhook Chatwoot').item.json.body.sender.name }}",
+            "kontak": "={{ $('Webhook Chatwoot').item.json.body.sender.phone_number }}",
             "intent": "iht-b2b",
             "tipe": "korporat",
             "status": "handoff",
@@ -351,7 +418,7 @@
           }
         }
       },
-      "notes": "MVP tidak menunggu balasan detail user dalam workflow ini (butuh percabangan giliran-per-giliran) — cukup catat 'ada minat B2B' dan biarkan agent menggali detail saat follow up. Bisa ditingkatkan nanti."
+      "notes": "nama & kontak dari body.sender."
     },
     {
       "id": "kirim-tanya-technical",
@@ -384,16 +451,17 @@
           "mappingMode": "defineBelow",
           "value": {
             "conversationId": "={{ $('Webhook Chatwoot').item.json.body.conversation.id }}",
-            "contactId": "={{ $('Webhook Chatwoot').item.json.body.contact.id }}",
-            "nama": "={{ $('Webhook Chatwoot').item.json.body.contact.name }}",
-            "kontak": "={{ $('Webhook Chatwoot').item.json.body.contact.phone_number || $('Webhook Chatwoot').item.json.body.contact.email }}",
+            "contactId": "={{ $('Webhook Chatwoot').item.json.body.sender.id }}",
+            "nama": "={{ $('Webhook Chatwoot').item.json.body.sender.name }}",
+            "kontak": "={{ $('Webhook Chatwoot').item.json.body.sender.phone_number }}",
             "intent": "technical",
             "tipe": "peserta-aktif",
             "status": "handoff",
             "infoTechnical": "={{ 'Menunggu balasan detail kendala dari peserta (dikumpulkan manual oleh agent saat follow up).' }}"
           }
         }
-      }
+      },
+      "notes": "nama & kontak dari body.sender."
     },
     {
       "id": "kirim-fallback",
@@ -412,7 +480,7 @@
         "options": {}
       },
       "credentials": { "httpHeaderAuth": { "id": "", "name": "Chatwoot API Token" } },
-      "notes": "Cabang teks bebas (bot_state=bebas) — MVP tidak punya AI, jadi langsung handoff, tidak mencoba menjawab."
+      "notes": "Cabang teks bebas (bot_state=bebas) — MVP tidak punya AI, langsung handoff."
     },
     {
       "id": "wf2-lain",
@@ -427,16 +495,17 @@
           "mappingMode": "defineBelow",
           "value": {
             "conversationId": "={{ $('Webhook Chatwoot').item.json.body.conversation.id }}",
-            "contactId": "={{ $('Webhook Chatwoot').item.json.body.contact.id }}",
-            "nama": "={{ $('Webhook Chatwoot').item.json.body.contact.name }}",
-            "kontak": "={{ $('Webhook Chatwoot').item.json.body.contact.phone_number || $('Webhook Chatwoot').item.json.body.contact.email }}",
+            "contactId": "={{ $('Webhook Chatwoot').item.json.body.sender.id }}",
+            "nama": "={{ $('Webhook Chatwoot').item.json.body.sender.name }}",
+            "kontak": "={{ $('Webhook Chatwoot').item.json.body.sender.phone_number }}",
             "intent": "lain",
             "tipe": "individu",
             "status": "handoff",
-            "programDiminati": "={{ $('Webhook Chatwoot').item.json.body.message.content }}"
+            "programDiminati": "={{ $('Webhook Chatwoot').item.json.body.content }}"
           }
         }
-      }
+      },
+      "notes": "Isi pesan dari body.content (bukan body.message.content). nama & kontak dari body.sender."
     }
   ],
   "connections": {
@@ -477,5 +546,8 @@
     "Kirim Pesan Fallback": { "main": [[{ "node": "Panggil WF-2-mini (handoff-lain)", "type": "main", "index": 0 }]] }
   },
   "pinData": {},
-  "meta": { "instanceId": "dilatih-mvp" }
+  "meta": {
+    "instanceId": "dilatih-mvp",
+    "notes": "Path payload diverifikasi dari webhook nyata Chatwoot 6 Sep 2026. Perubahan dari versi sebelumnya: body.sender.id/name/phone_number (bukan body.contact.*), body.id (bukan body.message.id), body.content (bukan body.message.content), body.conversation.messages[0].sender.type (bukan body.sender.type), body.conversation.messages[0].conversation.assignee_id (bukan body.conversation.assignee_id)."
+  }
 }
