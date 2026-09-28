@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "marketing/materials/campaign-plan-meta-cita-bnsp-sep2026.md",
+                "file": "marketing/blog/sejarah-simbol-at-asal-usul-email.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "campaign-plan-meta-cita-bnsp-sep2026"
+              "title": "sejarah-simbol-at-asal-usul-email"
             }
           }
         ],
@@ -202,6 +202,15 @@
   },
   "active": "0786daaf02a3f890",
   "lastOpenFiles": [
+    "marketing/blog/google-masih-pakai-kaset-pita-teknologi-tape-storage-gmail-drive.md",
+    "marketing/blog/sejarah-simbol-at-asal-usul-email.md",
+    "marketing/blog/teknologi-gps.md",
+    "marketing/materials/wa-templates-umum.md",
+    "marketing/materials/campaign-report-cita-bnsp-sep2026.md",
+    "marketing/materials/campaign-plan-meta-cita-bnsp-sep2026.md",
+    "marketing/blog/di-balik-layar-two-factor-authentication-2fa.md",
+    "Motekar-Edukasi-Ads-Aug-14-2026-Sep-12-2026.csv",
+    "marketing/blog/teknologi-canggih-di-rumah.md",
     "marketing/materials/paid-ads-creative-brief-v1.md",
     "marketing/materials/brief-visual-ads-itaudit-bnsp-extension-D-E-F-G-H.md",
     "marketing/materials/brief-visual-ads-itaudit-bnsp-sep2026.md",
@@ -210,7 +219,6 @@
     "toP9088.pdf",
     "toP9087.html",
     "export/campaign-report-cita-bnsp-sep2026.html",
-    "marketing/materials/campaign-plan-meta-cita-bnsp-sep2026.md",
     "export/IG-Story-CITA-BNSP.png",
     "export/IG-Feed-CITA-BNSP.png",
     "export",
@@ -220,13 +228,11 @@
     "marketing/materials/usulan-visual-story-sertifikasi-ai-fresh-graduate.md",
     "marketing/blog/teknologi-e-ktp.md",
     "marketing/brand-dna.md",
-    "marketing/blog/teknologi-gps.md",
     "marketing/materials/chatbot-chatwoot-n8n/mvp-leads-intent.md",
     "marketing/materials/chatbot-chatwoot-n8n/n8n/wf1-mini-inbound.json",
     "marketing/materials/chatbot-chatwoot-n8n/n8n/wf1-mini-inbound.json.tmp.11776.74a96cbbc58d",
     "marketing/materials/chatbot-chatwoot-n8n/keputusan-dan-arsitektur.md",
     "marketing/materials/chatbot-chatwoot-n8n/spesifikasi-workflow-n8n.md",
-    "marketing/materials/chatbot-chatwoot-n8n/n8n/wf2-mini-lead-capture.json",
     "marketing/materials/chatbot-chatwoot-n8n/panduan-implementasi.md",
     "marketing/materials/chatbot-chatwoot-n8n/system-prompt-bot.md",
     "marketing/materials/chatbot-chatwoot-n8n/labelling-dan-prioritas.md",
@@ -234,11 +240,6 @@
     "marketing/materials/chatbot-chatwoot-n8n/copy-percakapan.md",
     "marketing/materials/carousel-sertifikasi-ai-hr-b2b.md",
     "marketing/blog/data-center-pemanas-rumah-eropa.md",
-    "marketing/blog/incognito-mode.md",
-    "Script content/post-qris-linkedin.md",
-    "marketing/materials/carousel-sertifikasi-ai-professional.md",
-    "marketing/materials/usulan-visual-carousel-sertifikasi-ai-fresh-graduate-kompetisi-kerja.md",
-    "marketing/brand-voice.md",
-    "marketing/plan.md"
+    "marketing/blog/incognito-mode.md"
   ]
 }

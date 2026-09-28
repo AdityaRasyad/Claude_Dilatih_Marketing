@@ -12,7 +12,9 @@
       "WebFetch(domain:dribbble.com)",
       "WebFetch(domain:id.pinterest.com)",
       "WebFetch(domain:www.behance.net)",
-      "WebFetch(domain:mir-s3-cdn-cf.behance.net)"
+      "WebFetch(domain:mir-s3-cdn-cf.behance.net)",
+      "Read(//c/Users/adity/**)",
+      "Bash(npx skills *)"
     ]
   }
 }

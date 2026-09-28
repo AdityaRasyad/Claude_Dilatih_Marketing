@@ -31,6 +31,18 @@
       "skillPath": "skills/analytics/SKILL.md",
       "computedHash": "0746ff2fcdd0e74db43934487c0003265d7fe46dd232b3e17dbc3bcaf7aab850"
     },
+    "anti-slop-writing": {
+      "source": "adenaufal/anti-slop-writing",
+      "sourceType": "github",
+      "skillPath": "english/SKILL.md",
+      "computedHash": "fe988b0faa2b0af3496fbd919d010f6e1f9e5bc433010b95e2c1fcc21f03f3d8"
+    },
+    "anti-slop-writing-id": {
+      "source": "adenaufal/anti-slop-writing",
+      "sourceType": "github",
+      "skillPath": "indonesian/SKILL.md",
+      "computedHash": "85b8e6ceabedca1c4e30e250ae48842522fe00449f4ffaba5d813c4f63dadda3"
+    },
     "aso": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
